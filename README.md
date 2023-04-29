@@ -1,2 +1,2 @@
-# jsonmap
-Map JSON to Another Format
+# outmap
+Map JSON/XML to JSON output format
