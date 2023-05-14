@@ -1,9 +1,9 @@
-# @aux4/adapt
+# @aux4/adapter
 
 ## Install
 
 ```
-$ npm install --global @aux4/adapt
+$ npm install --global @aux4/adapter
 ```
 
 ### Usage
