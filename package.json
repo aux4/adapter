@@ -1,0 +1,41 @@
+{
+  "name": "@aux4/adpter",
+  "version": "0.1.1",
+  "description": "Adapt JSON/XML input to a predefined JSON output",
+  "main": "index.js",
+  "bin": {
+    "adapt": "./executable.js"
+  },
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aux4/adapter.git"
+  },
+  "keywords": [
+    "json",
+    "xml",
+    "mapping",
+    "transform",
+    "adapter",
+    "adapt"
+  ],
+  "author": "Aux4",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/aux4/adapter/issues"
+  },
+  "homepage": "https://github.com/aux4/adapter#readme",
+  "devDependencies": {
+    "jest": "^29.5.0"
+  },
+  "dependencies": {
+    "csv-parse": "^5.3.9",
+    "js-yaml": "^4.1.0",
+    "jsonpath": "^1.1.1",
+    "moment": "^2.29.4",
+    "xml2js": "^0.5.0",
+    "xml2js-xpath": "^0.13.0"
+  }
+}

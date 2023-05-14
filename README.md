@@ -1,17 +1,91 @@
-# adpter
-Adapt JSON/XML input to a predefined JSON output
+# @aux4/adapt
 
 ## Install
 
-To use it as `cli`:
-
 ```
-npm install --global @aux4/adapter
+$ npm install --global @aux4/adapt
 ```
 
+### Usage
 
-To use it as a `library`:
+#### mapping.yml
+
+```yaml
+transformers:
+  GENDER:
+    type: replace
+    replace:
+      M: MALE
+      F: FEMALE
+  DATE:
+    type: date
+    format: MM/DD/YYYY
+
+root:
+  path: $.data
+mapping:
+  name: $.name
+  age: $.age
+  birthdate:
+    path: $.birthdate
+    transformer: DATE
+  gender:
+    path: $.gender
+    transformer: GENDER
+  place:
+    type: object
+    mapping:
+      city: $.address.city
+```
+
+#### test.json
+
+```json
+{
+  "data": [
+    {
+      "name": "John",
+      "age": 31,
+      "birthdate": "1992-04-10",
+      "gender": "M",
+      "address": {
+        "city": "New York"
+      }
+    },
+    {
+      "name": "Mary",
+      "age": 27,
+      "birthdate": "1996-02-14",
+      "gender": "F",
+      "address": {
+        "city": "Boston"
+      }
+    }
+  ]
+}
+```
 
 ```
-npm install @aux4/adapter
+$ cat test.json | adapt mapping.yml
+
+[
+  {
+    "name": "John",
+    "age": 31,
+    "birthdate": "04/10/1992",
+    "gender": "MALE",
+    "place": {
+      "city": "New York"
+    }
+  },
+  {
+    "name": "Mary",
+    "age": 27,
+    "birthdate": "02/14/1996",
+    "gender": "FEMALE",
+    "place": {
+      "city": "Boston"
+    }
+  }
+]
 ```
