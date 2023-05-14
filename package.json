@@ -1,6 +1,6 @@
 {
   "name": "@aux4/adapter",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Adapt JSON/XML input to a predefined JSON output",
   "main": "index.js",
   "preferGlobal": true,
