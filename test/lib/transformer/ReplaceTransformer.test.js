@@ -1,4 +1,4 @@
-const { ReplaceTransformer } = require("../../../transformer");
+const { ReplaceTransformer } = require("../../../lib/transformer");
 
 describe("ReplaceTransformer", () => {
   let transformer;

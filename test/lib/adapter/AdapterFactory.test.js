@@ -1,4 +1,4 @@
-const { AdapterFactory } = require("../../..");
+const AdapterFactory = require("../../../lib/adapter/AdapterFactory");
 
 describe("AdapterFactory", () => {
   let factory;
@@ -10,11 +10,11 @@ describe("AdapterFactory", () => {
       customAdapter = jest.fn(() => {});
 
       factory = new AdapterFactory();
-      factory.register("application/excel", customAdapter);
+      factory.register("excel", customAdapter);
     });
 
     it("should return the custom adapter", () => {
-      expect(factory.get("application/excel")).toBeDefined();
+      expect(factory.get("excel")).toBeDefined();
       expect(customAdapter).toHaveBeenCalled();
     });
   });
@@ -27,14 +27,14 @@ describe("AdapterFactory", () => {
     describe("when type is not mapped", () => {
       it("should throw an error", () => {
         expect(() => {
-          factory.get("application/excel");
-        }).toThrowError("Unsupported content-type");
+          factory.get("excel");
+        }).toThrowError("Unsupported type");
       });
     });
 
     describe("when type is mapped", () => {
       it("should return an adapter", () => {
-        expect(factory.get("application/json")).toBeDefined();
+        expect(factory.get("json")).toBeDefined();
       });
     });
   });

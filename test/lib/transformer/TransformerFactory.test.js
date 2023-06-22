@@ -1,4 +1,4 @@
-const { DefaultTransformer } = require("../../../transformer");
+const { DefaultTransformer } = require("../../../lib/transformer");
 const { TransformerFactory } = require("../../..");
 
 describe("Transformer", () => {

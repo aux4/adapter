@@ -1,5 +1,5 @@
 const { AdapterFactory, TransformerFactory } = require("../..");
-const { DateTransformer } = require("../../transformer");
+const { DateTransformer } = require("../../lib/transformer");
 
 describe("Integration tests for JSON", () => {
   let adapter, inputFile, mappingConfig, output, transformerFactory;
@@ -26,7 +26,7 @@ describe("Integration tests for JSON", () => {
     it("should throw an error", () => {
       expect(async () => {
         await adapter
-          .get("application/json")
+          .get("json")
           .adapt(JSON.stringify(inputFile), mappingConfig.root, mappingConfig.mapping, transformerFactory);
       }).rejects.toThrow("No data");
     });
@@ -59,7 +59,7 @@ describe("Integration tests for JSON", () => {
 
       adapter = new AdapterFactory();
       output = await adapter
-        .get("application/json")
+        .get("json")
         .adapt(JSON.stringify(inputFile), mappingConfig.root, mappingConfig.mapping, transformerFactory);
     });
 
@@ -120,7 +120,7 @@ describe("Integration tests for JSON", () => {
 
       adapter = new AdapterFactory();
       output = await adapter
-        .get("application/json")
+        .get("json")
         .adapt(JSON.stringify(inputFile), mappingConfig.root, mappingConfig.mapping, transformerFactory);
     });
 
@@ -196,7 +196,7 @@ describe("Integration tests for JSON", () => {
 
       adapter = new AdapterFactory();
       output = await adapter
-        .get("application/json")
+        .get("json")
         .adapt(JSON.stringify(inputFile), mappingConfig.root, mappingConfig.mapping, transformerFactory);
     });
 
@@ -290,7 +290,7 @@ describe("Integration tests for JSON", () => {
 
       adapter = new AdapterFactory();
       output = await adapter
-        .get("application/json")
+        .get("json")
         .adapt(JSON.stringify(inputFile), mappingConfig.root, mappingConfig.mapping, transformerFactory);
     });
 
@@ -373,7 +373,7 @@ describe("Integration tests for JSON", () => {
 
       adapter = new AdapterFactory();
       output = await adapter
-        .get("application/json")
+        .get("json")
         .adapt(JSON.stringify(inputFile), mappingConfig.root, mappingConfig.mapping, transformerFactory);
     });
 
@@ -418,7 +418,7 @@ describe("Integration tests for JSON", () => {
 
       adapter = new AdapterFactory();
       output = await adapter
-        .get("application/json")
+        .get("json")
         .adapt(JSON.stringify(inputFile), mappingConfig.root, mappingConfig.mapping, transformerFactory);
     });
 

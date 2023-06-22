@@ -4,9 +4,11 @@ process.stdin.setEncoding("utf8");
 
 const fs = require("fs");
 const yaml = require("js-yaml");
-const { readStdIn } = require("./lib/Input");
-const { AdapterFactory, TransformerFactory } = require("./");
-const { ReplaceTransformer, DateTransformer } = require("./transformer");
+const { readStdIn } = require("../lib/Input");
+const { Config } = require("@aux4/config");
+const { Engine } = require("@aux4/engine");
+const { AdapterFactory, TransformerFactory } = require("../index");
+const { ReplaceTransformer, DateTransformer } = require("../lib/transformer");
 
 const args = process.argv.splice(2);
 

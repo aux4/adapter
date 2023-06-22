@@ -1,4 +1,4 @@
-const { DateTransformer } = require("../../../transformer");
+const { DateTransformer } = require("../../../lib/transformer");
 
 describe("DateTransformer", () => {
   let transformer;

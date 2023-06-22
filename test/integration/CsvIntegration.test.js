@@ -1,5 +1,5 @@
 const { AdapterFactory, TransformerFactory } = require("../..");
-const { DateTransformer } = require("../../transformer");
+const { DateTransformer } = require("../../lib/transformer");
 
 describe("Integration tests for CSV", () => {
   let adapter, inputFile, mappingConfig, output, transformerFactory;
@@ -18,7 +18,7 @@ John Doe,42
 Jane Doe,43`;
 
       adapter = new AdapterFactory();
-      output = await adapter.get("text/csv").adapt(inputFile, {}, mappingConfig.mapping, transformerFactory);
+      output = await adapter.get("csv").adapt(inputFile, {}, mappingConfig.mapping, transformerFactory);
     });
 
     it("should output an array with name and age", () => {
@@ -57,7 +57,7 @@ John Doe,123 Main st,Anytown,CA,12345
 Jane Doe,456 Main st,Anytown,CA,12345`;
 
       adapter = new AdapterFactory();
-      output = await adapter.get("text/csv").adapt(inputFile, {}, mappingConfig.mapping, transformerFactory);
+      output = await adapter.get("csv").adapt(inputFile, {}, mappingConfig.mapping, transformerFactory);
     });
 
     it("should output an array with name and age", () => {
@@ -110,7 +110,7 @@ Jane Doe,02/14/1991`;
       transformerFactory.register("DATE", new DateTransformer(mappingConfig.transformers.DATE));
 
       adapter = new AdapterFactory();
-      output = await adapter.get("text/csv").adapt(inputFile, {}, mappingConfig.mapping, transformerFactory);
+      output = await adapter.get("csv").adapt(inputFile, {}, mappingConfig.mapping, transformerFactory);
     });
 
     it("should output an array with name and birthdate", () => {

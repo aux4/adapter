@@ -1,4 +1,4 @@
-const { CsvAdapter } = require("../../../adapter");
+const { CsvAdapter } = require("../../../lib/adapter");
 
 describe("CsvAdapter", () => {
   let adapter, csv, result;

@@ -1,5 +1,5 @@
 const { AdapterFactory, TransformerFactory } = require("../..");
-const { DateTransformer } = require("../../transformer");
+const { DateTransformer } = require("../../lib/transformer");
 
 describe("Integration tests for XML", () => {
   let adapter, inputFile, mappingConfig, output, transformer;
@@ -8,24 +8,26 @@ describe("Integration tests for XML", () => {
     beforeAll(async () => {
       mappingConfig = {
         mapping: {
-          name: "/root/name",
-          age: "/root/age"
+          type: "$.root._attr.type",
+          name: "$.root.name",
+          age: "$.root.age"
         }
       };
 
-      inputFile = `<root>
+      inputFile = `<root type="person">
         <name>John Doe</name>
         <age>42</age>
       </root>`;
 
       adapter = new AdapterFactory();
-      output = await adapter.get("application/xml").adapt(inputFile, {}, mappingConfig.mapping, transformer);
+      output = await adapter.get("xml").adapt(inputFile, {}, mappingConfig.mapping, transformer);
     });
 
     it("should output an object with name and age", () => {
       expect(output).toEqual({
+        type: "person",
         name: "John Doe",
-        age: "42"
+        age: 42
       });
     });
   });
@@ -34,11 +36,11 @@ describe("Integration tests for XML", () => {
     beforeAll(async () => {
       mappingConfig = {
         root: {
-          path: "/data/item"
+          path: "$.data.item"
         },
         mapping: {
-          name: "/name",
-          age: "/age"
+          name: "$.name",
+          age: "$.age"
         }
       };
 
@@ -55,20 +57,18 @@ describe("Integration tests for XML", () => {
       `;
 
       adapter = new AdapterFactory();
-      output = await adapter
-        .get("application/xml")
-        .adapt(inputFile, mappingConfig.root, mappingConfig.mapping, transformer);
+      output = await adapter.get("xml").adapt(inputFile, mappingConfig.root, mappingConfig.mapping, transformer);
     });
 
     it("should output an array with name and age", () => {
       expect(output).toEqual([
         {
           name: "John Doe",
-          age: "42"
+          age: 42
         },
         {
           name: "Jane Doe",
-          age: "43"
+          age: 43
         }
       ]);
     });
@@ -78,17 +78,17 @@ describe("Integration tests for XML", () => {
     beforeAll(async () => {
       mappingConfig = {
         root: {
-          path: "/data/item"
+          path: "$.data.item"
         },
         mapping: {
-          name: "/name",
+          name: "$.name",
           address: {
             type: "object",
             mapping: {
-              street: "/street",
-              city: "/city",
-              state: "/state",
-              zip: "/zip"
+              street: "$.street",
+              city: "$.city",
+              state: "$.state",
+              zip: "$.zip"
             }
           }
         }
@@ -113,9 +113,7 @@ describe("Integration tests for XML", () => {
       `;
 
       adapter = new AdapterFactory();
-      output = await adapter
-        .get("application/xml")
-        .adapt(inputFile, mappingConfig.root, mappingConfig.mapping, transformer);
+      output = await adapter.get("xml").adapt(inputFile, mappingConfig.root, mappingConfig.mapping, transformer);
     });
 
     it("should output an array with name and age", () => {
@@ -126,7 +124,7 @@ describe("Integration tests for XML", () => {
             street: "123 Main st",
             city: "Anytown",
             state: "CA",
-            zip: "12345"
+            zip: 12345
           }
         },
         {
@@ -135,7 +133,7 @@ describe("Integration tests for XML", () => {
             street: "456 Main st",
             city: "Anytown",
             state: "CA",
-            zip: "12345"
+            zip: 12345
           }
         }
       ]);
@@ -152,12 +150,12 @@ describe("Integration tests for XML", () => {
           }
         },
         root: {
-          path: "/data/item"
+          path: "$.data.item"
         },
         mapping: {
-          name: "/name",
+          name: "$.name",
           birthdate: {
-            path: "/birthday",
+            path: "$.birthday",
             transformer: "DATE"
           }
         }
@@ -179,9 +177,7 @@ describe("Integration tests for XML", () => {
       transformer.register("DATE", new DateTransformer(mappingConfig.transformers.DATE));
 
       adapter = new AdapterFactory();
-      output = await adapter
-        .get("application/xml")
-        .adapt(inputFile, mappingConfig.root, mappingConfig.mapping, transformer);
+      output = await adapter.get("xml").adapt(inputFile, mappingConfig.root, mappingConfig.mapping, transformer);
     });
 
     it("should output an array with name and birthdate", () => {

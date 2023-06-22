@@ -1,4 +1,4 @@
-const { JsonAdapter } = require("../../../adapter");
+const { JsonAdapter } = require("../../../lib/adapter");
 
 describe("JsonAdapter", () => {
   let adapter;
