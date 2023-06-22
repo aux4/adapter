@@ -12,12 +12,6 @@ const { ReplaceTransformer, DateTransformer } = require("../lib/transformer");
 
 const args = process.argv.splice(2);
 
-const SUPPORTED_FORMATS = {
-  json: "application/json",
-  xml: "application/xml",
-  csv: "text/csv"
-};
-
 const TRANSFORMER_TYPES = {
   date: DateTransformer,
   replace: ReplaceTransformer

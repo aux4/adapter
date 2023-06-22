@@ -435,4 +435,48 @@ describe("Integration tests for JSON", () => {
       ]);
     });
   });
+
+  describe("when field has expression", () => {
+    beforeAll(async () => {
+      mappingConfig = {
+        root: {
+          path: "$.data"
+        },
+        mapping: {
+          name: {
+            expr: "firstName & ' ' & lastName"
+          }
+        }
+      };
+
+      inputFile = {
+        data: [
+          {
+            firstName: "John",
+            lastName: "Doe"
+          },
+          {
+            firstName: "Jane",
+            lastName: "Doe"
+          }
+        ]
+      };
+
+      adapter = new AdapterFactory();
+      output = await adapter
+        .get("json")
+        .adapt(JSON.stringify(inputFile), mappingConfig.root, mappingConfig.mapping, transformerFactory);
+    });
+
+    it("should output an array with name", () => {
+      expect(output).toEqual([
+        {
+          name: "John Doe"
+        },
+        {
+          name: "Jane Doe"
+        }
+      ]);
+    });
+  });
 });
