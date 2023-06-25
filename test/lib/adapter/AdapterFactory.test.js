@@ -28,7 +28,7 @@ describe("AdapterFactory", () => {
       it("should throw an error", () => {
         expect(() => {
           factory.get("excel");
-        }).toThrowError("Unsupported type");
+        }).toThrowError("Unsupported format: excel");
       });
     });
 
