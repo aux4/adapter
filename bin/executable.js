@@ -1,68 +1,55 @@
-#!/usr/bin/env node
-
-process.stdin.setEncoding("utf8");
-
-const fs = require("fs");
-const yaml = require("js-yaml");
-const { readStdIn } = require("../lib/Input");
-const { Config } = require("@aux4/config");
+const colors = require("colors");
 const { Engine } = require("@aux4/engine");
-const { AdapterFactory, TransformerFactory } = require("../index");
-const { ReplaceTransformer, DateTransformer } = require("../lib/transformer");
+const { mapExecutor } = require("./command/MapExecutor");
 
-const args = process.argv.splice(2);
-
-const TRANSFORMER_TYPES = {
-  date: DateTransformer,
-  replace: ReplaceTransformer
+const config = {
+  profiles: [
+    {
+      name: "main",
+      commands: [
+        {
+          name: "map",
+          execute: async params => {
+            try {
+              await mapExecutor(params);
+            } catch (e) {
+              console.error(e.message.red);
+            }
+          },
+          help: {
+            text: "Map input to output",
+            variables: [
+              {
+                name: "configFile",
+                text: "Configuration file.\nIt automatically reads *config.yaml*, *config.yml*, *config.json*.",
+                default: ""
+              },
+              {
+                name: "config",
+                text: "Configuration name",
+                default: ""
+              },
+              {
+                name: "format",
+                text: "Input format. Supported formats: *json*, *xml*, *csv*.",
+                default: ""
+              },
+              {
+                name: "stream",
+                text: "Stream input",
+                default: false
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
 };
 
 (async () => {
-  const filePath = args[0];
-  const format = SUPPORTED_FORMATS[args[1] || "json"];
+  const engine = new Engine({ aux4: config });
 
-  const config = fs.readFileSync(filePath, { encoding: "utf8" });
-  const mapping = loadMapping(config);
-
-  const transformerFactory = new TransformerFactory();
-
-  Object.entries(mapping.transformers || {}).forEach(([name, transformerReference]) => {
-    const TransformerType = TRANSFORMER_TYPES[transformerReference.type];
-    if (!TransformerType) {
-      console.error(`Invalid transformer type: ${transformerReference.type}`);
-      process.exit(1);
-    }
-    transformerFactory.register(name, TransformerType(transformerReference));
-  });
-
-  const inputString = await readStdIn();
-
-  try {
-    const adapterFactory = new AdapterFactory();
-    const adapter = adapterFactory.get(format);
-    const output = await adapter.adapt(inputString, mapping.root, mapping.mapping, transformerFactory);
-
-    console.log(JSON.stringify(output, null, 2));
-  } catch (e) {
-    console.error(e.message, e);
-    process.exit(1);
-  }
+  const args = process.argv.splice(2);
+  await engine.run(args);
 })();
-
-function loadMapping(config) {
-  if (config.trim().startsWith("{")) {
-    try {
-      return JSON.parse(mapping);
-    } catch (e) {
-      console.error(`Invalid JSON file: ${e.message}`);
-      process.exit(1);
-    }
-  }
-
-  try {
-    return yaml.load(config, "utf8");
-  } catch (e) {
-    console.error(`Invalid YAML file: ${e.message}`);
-    process.exit(1);
-  }
-}

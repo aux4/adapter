@@ -1,6 +1,6 @@
 {
   "name": "@aux4/adapter",
-  "version": "0.1.5",
+  "version": "0.2.0",
   "description": "Adapt JSON/XML input to a predefined JSON output",
   "main": "index.js",
   "preferGlobal": true,
@@ -33,7 +33,7 @@
   },
   "dependencies": {
     "@aux4/config": "^1.0.1",
-    "@aux4/engine": "^1.0.13",
+    "@aux4/engine": "^1.0.14",
     "csv-parse": "^5.3.9",
     "fast-xml-parser": "^4.2.4",
     "js-yaml": "^4.1.0",
