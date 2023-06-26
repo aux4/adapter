@@ -33,7 +33,7 @@
   },
   "dependencies": {
     "@aux4/config": "^1.0.1",
-    "@aux4/engine": "^1.0.14",
+    "@aux4/engine": "^1.0.15",
     "csv-parse": "^5.3.9",
     "fast-xml-parser": "^4.2.4",
     "js-yaml": "^4.1.0",
