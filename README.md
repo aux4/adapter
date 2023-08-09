@@ -8,34 +8,36 @@ $ npm install --global @aux4/adapter
 
 ### Usage
 
-#### mapping.yml
+#### config.yml
 
 ```yaml
-transformers:
-  GENDER:
-    type: replace
-    replace:
-      M: MALE
-      F: FEMALE
-  DATE:
-    type: date
-    format: MM/DD/YYYY
-
-root:
-  path: $.data
-mapping:
-  name: $.name
-  age: $.age
-  birthdate:
-    path: $.birthdate
-    transformer: DATE
-  gender:
-    path: $.gender
-    transformer: GENDER
-  place:
-    type: object
+config:
+  my-mapping:
+    transformers:
+      GENDER:
+        type: replace
+        replace:
+          M: MALE
+          F: FEMALE
+      DATE:
+        type: date
+        format: MM/DD/YYYY
+    
+    root:
+      path: $.data
     mapping:
-      city: $.address.city
+      name: $.name
+      age: $.age
+      birthdate:
+        path: $.birthdate
+        transformer: DATE
+      gender:
+        path: $.gender
+        transformer: GENDER
+      place:
+        type: object
+        mapping:
+          city: $.address.city
 ```
 
 #### test.json
@@ -66,7 +68,10 @@ mapping:
 ```
 
 ```
-$ cat test.json | adapt mapping.yml
+$ cat test.json | adapt map --config my-mapping --format json
+```
+
+```json
 
 [
   {

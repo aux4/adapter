@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 const colors = require("colors");
 const { Engine } = require("@aux4/engine");
 const { mapExecutor } = require("./command/MapExecutor");

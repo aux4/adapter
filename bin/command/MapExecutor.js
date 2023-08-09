@@ -37,7 +37,7 @@ async function mapExecutor(params) {
     const output = await adapter.adapt(inputString, mapping.root, mapping.mapping, transformerFactory, params);
     console.log(JSON.stringify(output, null, 2));
   } catch (e) {
-    console.error(e.message);
+    console.error(e.message.red);
   }
 }
 
