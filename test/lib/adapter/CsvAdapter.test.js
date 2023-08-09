@@ -22,7 +22,7 @@ describe("CsvAdapter", () => {
     let result;
 
     beforeAll(async () => {
-      csv = await adapter.parse("name,age\nJohn,30");
+      csv = await adapter.parse("name,age\nJohn,30", {});
       result = adapter.getValue(csv[0], "$.name");
     });
 

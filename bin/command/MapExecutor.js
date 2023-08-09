@@ -15,20 +15,20 @@ async function mapExecutor(params) {
   const adapter = adapterFactory.get(format);
 
   if (stream) {
-    const parser = await adapter.stream(mapping.root?.path);
+    const parser = await adapter.stream(mapping.root?.path, params);
     const adapterTransformer = new AdapterTransformer(adapter, mapping, transformerFactory);
     process.stdin
       .pipe(parser)
       .pipe(adapterTransformer)
       .pipe(process.stdout)
-      .onError(err => {
+      .on("error", err => {
         console.error(err.message);
       });
     return;
   }
 
   const inputString = await readStdIn();
-  const output = await adapter.adapt(inputString, mapping.root, mapping.mapping, transformerFactory);
+  const output = await adapter.adapt(inputString, mapping.root, mapping.mapping, transformerFactory, params);
   console.log(JSON.stringify(output, null, 2));
 }
 

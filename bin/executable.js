@@ -35,8 +35,18 @@ const config = {
                 default: ""
               },
               {
+                name: "delimiter",
+                text: "CSV delimiter",
+                default: ","
+              },
+              {
+                name: "columns",
+                text: "CSV column names (comma separated)",
+                default: ""
+              },
+              {
                 name: "stream",
-                text: "Stream input",
+                text: "Stream output",
                 default: false
               }
             ]
