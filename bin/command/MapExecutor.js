@@ -14,22 +14,31 @@ async function mapExecutor(params) {
   const adapterFactory = new AdapterFactory();
   const adapter = adapterFactory.get(format);
 
+  const onError = e => {
+    console.error(e.message.red);
+    process.exit(1);
+  };
+
   if (stream) {
     const parser = await adapter.stream(mapping.root?.path, params);
     const adapterTransformer = new AdapterTransformer(adapter, mapping, transformerFactory);
     process.stdin
       .pipe(parser)
+      .on("error", onError)
       .pipe(adapterTransformer)
+      .on("error", onError)
       .pipe(process.stdout)
-      .on("error", err => {
-        console.error(err.message);
-      });
+      .on("error", onError);
     return;
   }
 
-  const inputString = await readStdIn();
-  const output = await adapter.adapt(inputString, mapping.root, mapping.mapping, transformerFactory, params);
-  console.log(JSON.stringify(output, null, 2));
+  try {
+    const inputString = await readStdIn();
+    const output = await adapter.adapt(inputString, mapping.root, mapping.mapping, transformerFactory, params);
+    console.log(JSON.stringify(output, null, 2));
+  } catch (e) {
+    console.error(e.message);
+  }
 }
 
 class AdapterTransformer extends Transform {
