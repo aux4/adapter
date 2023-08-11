@@ -5,14 +5,14 @@ const TRANSFORMER_TYPES = require("../util/TransformerTypes");
 const { readStdIn } = require("../../lib/Input");
 
 async function mapExecutor(params) {
-  const mapping = await loadMapping(params);
+  const config = await loadConfig(params);
   const stream = await params.stream;
-  const format = (await params.format) || mapping.format;
+  const format = (await params.format) || config.format;
 
-  const transformerFactory = TransformerFactory.load(mapping, TRANSFORMER_TYPES);
+  const transformerFactory = TransformerFactory.load(config, TRANSFORMER_TYPES);
 
   const adapterFactory = new AdapterFactory();
-  const adapter = adapterFactory.get(format);
+  const adapter = adapterFactory.get(format, config);
 
   const onError = e => {
     console.error(e.message.red);
@@ -20,8 +20,8 @@ async function mapExecutor(params) {
   };
 
   if (stream) {
-    const parser = await adapter.stream(mapping.root?.path, params);
-    const adapterTransformer = new AdapterTransformer(adapter, mapping, transformerFactory);
+    const parser = await adapter.stream(config.root?.path, params);
+    const adapterTransformer = new AdapterTransformer(adapter, config, transformerFactory);
     process.stdin
       .pipe(parser)
       .on("error", onError)
@@ -34,7 +34,7 @@ async function mapExecutor(params) {
 
   try {
     const inputString = await readStdIn();
-    const output = await adapter.adapt(inputString, mapping.root, mapping.mapping, transformerFactory, params);
+    const output = await adapter.adapt(inputString, config.root, config.mapping, transformerFactory, params);
     console.log(JSON.stringify(output, null, 2));
   } catch (e) {
     console.error(e.message.red);
@@ -56,7 +56,7 @@ class AdapterTransformer extends Transform {
   }
 }
 
-async function loadMapping(params) {
+async function loadConfig(params) {
   const configFile = await params.configFile;
   const configName = await params.config;
 
