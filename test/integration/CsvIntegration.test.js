@@ -90,6 +90,7 @@ Jane Doe,456 Main st,Anytown,CA,12345`;
         transformers: {
           DATE: {
             type: "date",
+            pattern: "MM/DD/YYYY",
             format: "MM/DD/YYYY"
           }
         },
