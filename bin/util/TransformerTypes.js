@@ -1,8 +1,9 @@
-const { DateTransformer, ReplaceTransformer } = require("../../lib/transformer");
+const { DateTransformer, ReplaceTransformer, RemoveTransformer } = require("../../lib/transformer");
 
 const TRANSFORMER_TYPES = {
   date: DateTransformer,
-  replace: ReplaceTransformer
+  replace: ReplaceTransformer,
+  remove: RemoveTransformer
 };
 
 module.exports = TRANSFORMER_TYPES;

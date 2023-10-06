@@ -4,6 +4,8 @@ const colors = require("colors");
 const { Engine } = require("@aux4/engine");
 const { mapExecutor } = require("./command/MapExecutor");
 
+process.title = "aux4-adapter";
+
 const config = {
   profiles: [
     {
