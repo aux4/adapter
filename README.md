@@ -68,7 +68,7 @@ config:
 ```
 
 ```
-$ cat test.json | adapt map --config my-mapping --format json
+$ cat test.json | adapter map --config my-mapping --format json
 ```
 
 ```json
