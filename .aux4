@@ -4,28 +4,28 @@
       "name": "main",
       "commands": [
         {
-          "value": "ship",
+          "name": "ship",
           "execute": [
             "git pull -r",
             "npm test",
             "git push"
           ],
           "help": {
-            "description": "🚢 pull test and push the code"
+            "text": "🚢 pull test and push the code"
           }
         },
         {
-          "value": "test-summary",
+          "name": "test-summary",
           "execute": [
             "echo '# Test Summary\n' > test/README.md",
             "cd test && ls *.test.md | xargs -I {} sh -c 'echo \"* [$(head -n 1 {} | cut -c3-)]({})\" >> README.md'"
           ],
           "help": {
-            "description": "generate test summary"
+            "text": "generate test summary"
           }
         },
         {
-          "value": "release",
+          "name": "release",
           "execute": [
             "git pull -r",
             "npm test",
@@ -39,7 +39,7 @@
             "echo ${versionNumber} released successfully"
           ],
           "help": {
-            "description": "release new version of @aux4/adapter",
+            "text": "release new version of @aux4/adapter",
             "variables": [
               {
                 "name": "version",
