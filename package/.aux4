@@ -1,0 +1,115 @@
+{
+  "scope": "aux4",
+  "name": "adapter",
+  "version": "1.0.0",
+  "description": "Aux4 adapter for mapping configuration values to specific formats.",
+  "tags": [
+    "aux4",
+    "adapter",
+    "mapping",
+    "json",
+    "xml",
+    "csv"
+  ],
+  "profiles": [
+    {
+      "name": "main",
+      "commands": [
+        {
+          "name": "testing",
+          "execute": [
+            "log: map values(format, delimiter, columns, options, transformers, mapping)"
+          ],
+          "help": {
+            "text": "Log Testing",
+            "variables": [
+              {
+                "name": "format",
+                "text": "The format to map the value to, e.g., 'json', 'xml'."
+              },
+              {
+                "name": "delimiter",
+                "text": "The delimiter to use for separating values in the output, if applicable.",
+                "default": ","
+              },
+              {
+                "name": "columns",
+                "text": "The columns to include in the output, if applicable.",
+                "default": ""
+              },
+              {
+                "name": "options",
+                "text": "Additional options for the mapping process.",
+                "default": "{}"
+              },
+              {
+                "name": "transformers",
+                "text": "The JSON transformers to apply to the value before mapping.",
+                "default": "[]"
+              },
+              {
+                "name": "mapping",
+                "text": "The JSON mapping configuration to use.",
+                "default": "{}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "adapter",
+          "execute": [
+            "profile:adapter"
+          ],
+          "help": {
+            "text": "Adapt configuration values to specific formats."
+          }
+        }
+      ]
+    },
+    {
+      "name": "adapter",
+      "commands": [
+        {
+          "name": "map",
+          "execute": [
+            "stdin:node ${packageDir}/lib/aux4-adapter.js map values(format, delimiter, columns, options, transformers, mapping)"
+          ],
+          "help": {
+            "text": "Maps a configuration value to a specific format.",
+            "variables": [
+              {
+                "name": "format",
+                "text": "The format to map the value to, e.g., 'json', 'xml'."
+              },
+              {
+                "name": "delimiter",
+                "text": "The delimiter to use for separating values in the output, if applicable.",
+                "default": ","
+              },
+              {
+                "name": "columns",
+                "text": "The columns to include in the output, if applicable.",
+                "default": ""
+              },
+              {
+                "name": "options",
+                "text": "Additional options for the mapping process.",
+                "default": "{}"
+              },
+              {
+                "name": "transformers",
+                "text": "The JSON transformers to apply to the value before mapping.",
+                "default": "[]"
+              },
+              {
+                "name": "mapping",
+                "text": "The JSON mapping configuration to use.",
+                "default": "{}"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

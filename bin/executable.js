@@ -1,73 +1,31 @@
 #!/usr/bin/env node
 
 const colors = require("colors");
-const { Engine } = require("@aux4/engine");
-const { mapExecutor } = require("./command/MapExecutor");
+const { mapExecutor } = require("./command/MapExecutor.js");
 
 process.title = "aux4-adapter";
 
-const config = {
-  profiles: [
-    {
-      name: "main",
-      commands: [
-        {
-          name: "map",
-          execute: async params => {
-            try {
-              await mapExecutor(params);
-            } catch (e) {
-              console.error(e.message.red);
-            }
-          },
-          help: {
-            text: "Map input to output",
-            variables: [
-              {
-                name: "configFile",
-                text: "Configuration file.\nIt automatically reads *config.yaml*, *config.yml*, *config.json*.",
-                default: ""
-              },
-              {
-                name: "config",
-                text: "Configuration name",
-                default: ""
-              },
-              {
-                name: "format",
-                text: "Input format. Supported formats: *json*, *xml*, *csv*.",
-                default: ""
-              },
-              {
-                name: "delimiter",
-                text: "CSV delimiter",
-                default: ","
-              },
-              {
-                name: "columns",
-                text: "CSV column names (comma separated)",
-                default: ""
-              },
-              {
-                name: "stream",
-                text: "Stream output",
-                default: false
-              }
-            ]
-          }
-        }
-      ]
-    }
-  ]
-};
-
 (async () => {
-  const engine = new Engine({ aux4: config });
-
-  const args = process.argv.splice(2);
+  const args = process.argv.slice(2);
 
   try {
-    await engine.run(args);
+    const [action, format, delimiter, columns, options, transformers, mapping] = args;
+
+    if (action !== "map") {
+      console.error(`Unknown action: ${action}. Expected "map".`.red);
+      process.exit(1);
+    }
+
+    const config = {
+      format: format || "",
+      delimiter: delimiter || ",",
+      columns: columns || "",
+      options: options ? JSON.parse(options) : {},
+      transformers: transformers ? JSON.parse(transformers) : [],
+      mapping: mapping ? JSON.parse(mapping) : {}
+    };
+
+    await mapExecutor(config);
   } catch (e) {
     console.error(e.message.red);
     process.exit(1);

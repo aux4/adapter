@@ -1,13 +1,13 @@
 const { Transform } = require("stream");
-const { ConfigLoader } = require("@aux4/config");
-const { AdapterFactory, TransformerFactory } = require("../../index");
+const AdapterFactory = require("../../lib/adapter/AdapterFactory");
+const TransformerFactory = require("../../lib/transformer/TransformerFactory");
 const TRANSFORMER_TYPES = require("../util/TransformerTypes");
 const { readStdIn } = require("../../lib/Input");
 
-async function mapExecutor(params) {
-  const config = await loadConfig(params);
-  const stream = await params.stream;
-  const format = (await params.format) || config.format;
+async function mapExecutor(config) {
+  
+  const stream = config.stream;
+  const format = config.format;
 
   const transformerFactory = TransformerFactory.load(config, TRANSFORMER_TYPES);
 
@@ -20,7 +20,7 @@ async function mapExecutor(params) {
   };
 
   if (stream) {
-    const parser = await adapter.stream(config.root?.path, params);
+    const parser = await adapter.stream(config.root?.path, config);
     const adapterTransformer = new AdapterTransformer(adapter, config, transformerFactory);
     process.stdin
       .pipe(parser)
@@ -34,7 +34,7 @@ async function mapExecutor(params) {
 
   try {
     const inputString = await readStdIn();
-    const output = await adapter.adapt(inputString, config.root, config.mapping, transformerFactory, params);
+    const output = await adapter.adapt(inputString, config.root, config.mapping, transformerFactory, config);
     console.log(JSON.stringify(output, null, 2));
   } catch (e) {
     console.error(e.message.red);
@@ -49,19 +49,11 @@ class AdapterTransformer extends Transform {
     this.transformerFactory = transformerFactory;
   }
 
-  _transform(chunk, encoding, callback) {
+  _transform(chunk, _, callback) {
     this.adapter
       .adapt(chunk, undefined, this.mapping.mapping, this.transformerFactory)
       .then(output => callback(null, JSON.stringify(output, null, 2)));
   }
-}
-
-async function loadConfig(params) {
-  const configFile = await params.configFile;
-  const configName = await params.config;
-
-  const config = ConfigLoader.load(configFile);
-  return config.get(configName);
 }
 
 module.exports = { mapExecutor };

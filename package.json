@@ -9,7 +9,9 @@
   },
   "scripts": {
     "test": "aux4-test run",
-    "coverage": "aux4-test coverage"
+    "coverage": "aux4-test coverage",
+    "build": "rollup -c --bundleConfigAsCjs",
+    "build:watch": "rollup -c -w"
   },
   "repository": {
     "type": "git",
@@ -30,8 +32,7 @@
   },
   "homepage": "https://github.com/aux4/adapter#readme",
   "dependencies": {
-    "@aux4/config": "^1.0.3",
-    "@aux4/engine": "^1.0.67",
+    "colors": "^1.4.0",
     "csv-parse": "^5.6.0",
     "fast-xml-parser": "^4.3.2",
     "js-yaml": "^4.1.0",
@@ -42,6 +43,10 @@
     "uuid": "^11.1.0"
   },
   "devDependencies": {
-    "@aux4/test": "^0.0.18"
+    "@aux4/test": "^0.0.18",
+    "@rollup/plugin-commonjs": "^28.0.6",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^16.0.1",
+    "rollup": "^4.46.2"
   }
 }
