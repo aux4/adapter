@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<organization>
+    <company name="Tech Solutions Inc" founded="2010">
+        <departments>
+            <department id="eng" name="Engineering">
+                <employees>
+                    <employee id="101" level="senior">
+                        <personal>
+                            <name>John Doe</name>
+                            <email>john@techsolutions.com</email>
+                            <joinDate>2020-03-15</joinDate>
+                        </personal>
+                        <role>
+                            <title>Senior Developer</title>
+                            <skills>
+                                <skill priority="high">JavaScript</skill>
+                                <skill priority="high">Python</skill>
+                                <skill priority="medium">Docker</skill>
+                            </skills>
+                        </role>
+                        <compensation currency="USD">95000</compensation>
+                    </employee>
+                    <employee id="102" level="mid">
+                        <personal>
+                            <name>Alice Johnson</name>
+                            <email>alice@techsolutions.com</email>
+                            <joinDate>2021-08-01</joinDate>
+                        </personal>
+                        <role>
+                            <title>Full Stack Developer</title>
+                            <skills>
+                                <skill priority="high">React</skill>
+                                <skill priority="high">Node.js</skill>
+                                <skill priority="low">AWS</skill>
+                            </skills>
+                        </role>
+                        <compensation currency="USD">75000</compensation>
+                    </employee>
+                </employees>
+            </department>
+            <department id="design" name="Design">
+                <employees>
+                    <employee id="201" level="senior">
+                        <personal>
+                            <name>Jane Smith</name>
+                            <email>jane@techsolutions.com</email>
+                            <joinDate>2019-11-20</joinDate>
+                        </personal>
+                        <role>
+                            <title>Lead UX Designer</title>
+                            <skills>
+                                <skill priority="high">Figma</skill>
+                                <skill priority="medium">Sketch</skill>
+                                <skill priority="low">Photoshop</skill>
+                            </skills>
+                        </role>
+                        <compensation currency="USD">85000</compensation>
+                    </employee>
+                </employees>
+            </department>
+        </departments>
+    </company>
+</organization>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<people>
+    <person id="1">
+        <name>John Doe</name>
+        <age>31</age>
+        <birthdate>1992-04-10</birthdate>
+        <gender>M</gender>
+        <city>New York</city>
+    </person>
+    <person id="2">
+        <name>Jane Smith</name>
+        <age>29</age>
+        <birthdate>1994-02-10</birthdate>
+        <gender>F</gender>
+        <city>Boston</city>
+    </person>
+    <person id="3">
+        <name>Mike Johnson</name>
+        <age>42</age>
+        <birthdate>1981-08-15</birthdate>
+        <gender>M</gender>
+        <city>Chicago</city>
+    </person>
+</people>

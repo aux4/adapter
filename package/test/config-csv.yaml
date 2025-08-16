@@ -43,7 +43,8 @@ config:
   csv:
     format: csv
     delimiter: ","
-    skipRecordsWithEmptyValues: true
+    options:
+      skipRecordsWithEmptyValues: true
     transformers:
       GENDER:
         type: replace
@@ -57,7 +58,6 @@ config:
         type: remove
         list:
           - "NEW"
-
     mapping:
       name: $.name
       age:

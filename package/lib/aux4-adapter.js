@@ -14984,6 +14984,9 @@ function requireAdapter () {
 
 	const JSONPATH_REGEX = /\$(\[\d+])?(\.[a-zA-Z0-9-_$]+(\[\d+])?)*/g;
 
+	// Cache for compiled mappings to avoid repeated parsing
+	const compiledMappingCache = new Map();
+
 	const expressionProcessor = new ExpressionProcessor();
 	expressionProcessor.register(new UuidExpression());
 	expressionProcessor.register(new NowExpression());
@@ -15005,22 +15008,46 @@ function requireAdapter () {
 	  return await adaptObject(adapter, rootNode, responseMapping, transformerFactory);
 	}
 
+	// Pre-compile mapping configuration for performance
+	function compileMappingConfig(responseMapping) {
+	  const cacheKey = JSON.stringify(responseMapping);
+	  if (compiledMappingCache.has(cacheKey)) {
+	    return compiledMappingCache.get(cacheKey);
+	  }
+
+	  const compiled = [];
+	  for (const [key, value] of Object.entries(responseMapping)) {
+	    let config;
+	    if (typeof value === "object") {
+	      config = {
+	        key,
+	        path: value.path,
+	        type: value.type,
+	        defaultValue: value.default,
+	        text: value.text,
+	        transformer: value.transformer,
+	        expression: value.expr,
+	        mapping: value.mapping
+	      };
+	    } else {
+	      config = { key, path: value };
+	    }
+	    compiled.push(config);
+	  }
+	  
+	  compiledMappingCache.set(cacheKey, compiled);
+	  return compiled;
+	}
+
 	async function adaptObject(adapter, object, responseMapping, transformerFactory) {
 	  const response = {};
+	  
+	  const compiledMapping = compileMappingConfig(responseMapping);
 
-	  for (const [key, value] of Object.entries(responseMapping)) {
-	    let path, type, defaultValue, text, transformer, expression;
-
-	    if (typeof value === "object") {
-	      path = value.path;
-	      type = value.type;
-	      defaultValue = value.default;
-	      text = value.text;
-	      transformer = value.transformer;
-	      expression = value.expr;
-	    } else {
-	      path = value;
-	    }
+	  // Optimize: Use for loop instead of for...of for better performance
+	  for (let i = 0; i < compiledMapping.length; i++) {
+	    const config = compiledMapping[i];
+	    const { key, path, type, defaultValue, text, transformer, expression, mapping } = config;
 
 	    if (expression) {
 	      response[key] = await expressionProcessor.evaluate(expression, object);
@@ -15040,44 +15067,64 @@ function requireAdapter () {
 	        return variableValue;
 	      }).trim();
 	    } else if (type === "object") {
-	      fieldValue = await adaptObject(adapter, object, value.mapping, transformerFactory);
+	      fieldValue = await adaptObject(adapter, object, mapping, transformerFactory);
 	    }
 
-	    if (transformer) {
+	    // Optimize: Early exit if field value is undefined and no default
+	    if (fieldValue === undefined && defaultValue === undefined) {
+	      continue;
+	    }
+
+	    // Apply transformer if present
+	    if (transformer && fieldValue !== undefined) {
 	      fieldValue = transformerFactory.get(transformer).transform(fieldValue);
 	    }
 
-	    if (type === "number" && fieldValue !== undefined) {
-	      fieldValue = Number(fieldValue);
-	    } else if (type === "boolean" && fieldValue !== undefined) {
-	      fieldValue = `${fieldValue}`.toLowerCase() === "true";
-	    }
-
-	    if (path && fieldValue !== undefined) {
-	      if (type === "array") {
-	        const array = Array.isArray(fieldValue) ? fieldValue : [fieldValue];
-	        fieldValue = await Promise.all(
-	          array.map(item => adaptObject(adapter, item, value.mapping, transformerFactory))
-	        );
-	      } else if (type === "object") {
-	        fieldValue = await adaptObject(adapter, fieldValue, value.mapping, transformerFactory);
-	      } else if (Array.isArray(fieldValue)) {
-	        fieldValue = fieldValue.join(", ");
+	    // Optimize: Combine type conversions to avoid multiple checks
+	    if (fieldValue !== undefined) {
+	      switch (type) {
+	        case "number":
+	          fieldValue = Number(fieldValue);
+	          break;
+	        case "boolean":
+	          fieldValue = `${fieldValue}`.toLowerCase() === "true";
+	          break;
+	        case "array":
+	          if (path) {
+	            const array = Array.isArray(fieldValue) ? fieldValue : [fieldValue];
+	            fieldValue = await Promise.all(
+	              array.map(item => adaptObject(adapter, item, mapping, transformerFactory))
+	            );
+	          }
+	          break;
+	        case "object":
+	          if (path) {
+	            fieldValue = await adaptObject(adapter, fieldValue, mapping, transformerFactory);
+	          }
+	          break;
+	        default:
+	          if (Array.isArray(fieldValue)) {
+	            fieldValue = fieldValue.join(", ");
+	          }
 	      }
 	    }
 
-	    if (fieldValue === "") {
+	    // Optimize: Handle empty values more efficiently
+	    if (fieldValue === "" || fieldValue === null) {
 	      fieldValue = undefined;
 	    }
 
-	    if (defaultValue !== undefined && fieldValue === undefined) {
+	    // Apply default value if needed
+	    if (fieldValue === undefined && defaultValue !== undefined) {
 	      fieldValue = defaultValue;
 	    }
 
-	    if (typeof fieldValue === "object" && Object.keys(fieldValue).length === 0) {
+	    // Optimize: Skip empty objects check if not an object
+	    if (typeof fieldValue === "object" && fieldValue !== null && Object.keys(fieldValue).length === 0) {
 	      fieldValue = undefined;
 	    }
 
+	    // Only set field if it has a value
 	    if (fieldValue !== undefined) {
 	      response[key] = fieldValue;
 	    }
@@ -15086,7 +15133,13 @@ function requireAdapter () {
 	  return response;
 	}
 
-	Adapter = { adapt };
+	// Streaming version that works with individual chunks
+	async function adaptStream(adapter, chunk, responseMapping, transformerFactory) {
+	  // For streaming, we assume the chunk is already parsed (e.g., a single CSV row object)
+	  return await adaptObject(adapter, chunk, responseMapping, transformerFactory);
+	}
+
+	Adapter = { adapt, adaptStream };
 	return Adapter;
 }
 
@@ -15379,7 +15432,7 @@ function requireCjs () {
 	    );
 	  }
 	  // Normalize option `columns`
-	  options.cast_first_line_to_header = null;
+	  options.cast_first_line_to_header = undefined;
 	  if (options.columns === true) {
 	    // Fields in the first line are converted as-is to columns
 	    options.cast_first_line_to_header = undefined;
@@ -15911,7 +15964,7 @@ function requireCjs () {
 	  // Normalize option `to`
 	  if (options.to === undefined || options.to === null) {
 	    options.to = -1;
-	  } else {
+	  } else if (options.to !== -1) {
 	    if (typeof options.to === "string" && /\d+/.test(options.to)) {
 	      options.to = parseInt(options.to);
 	    }
@@ -15930,7 +15983,7 @@ function requireCjs () {
 	  // Normalize option `to_line`
 	  if (options.to_line === undefined || options.to_line === null) {
 	    options.to_line = -1;
-	  } else {
+	  } else if (options.to_line !== -1) {
 	    if (typeof options.to_line === "string" && /\d+/.test(options.to_line)) {
 	      options.to_line = parseInt(options.to_line);
 	    }
@@ -16061,10 +16114,14 @@ function requireCjs () {
 	              this.state.bufBytesStart += bomLength;
 	              buf = buf.slice(bomLength);
 	              // Renormalize original options with the new encoding
-	              this.options = normalize_options({
+	              const options = normalize_options({
 	                ...this.original_options,
 	                encoding: encoding,
 	              });
+	              // Properties are merged with the existing options instance
+	              for (const key in options) {
+	                this.options[key] = options[key];
+	              }
 	              // Options will re-evaluate the Buffer with the new encoding
 	              ({ comment, escape, quote } = this.options);
 	              break;
@@ -16807,10 +16864,14 @@ function requireCjs () {
 	      if (skip_records_with_error) {
 	        this.state.recordHasError = true;
 	        if (this.options.on_skip !== undefined) {
-	          this.options.on_skip(
-	            err,
-	            raw ? this.state.rawBuffer.toString(encoding) : undefined,
-	          );
+	          try {
+	            this.options.on_skip(
+	              err,
+	              raw ? this.state.rawBuffer.toString(encoding) : undefined,
+	            );
+	          } catch (err) {
+	            return err;
+	          }
 	        }
 	        // this.emit('skip', err, raw ? this.state.rawBuffer.toString(encoding) : undefined);
 	        return undefined;
@@ -16984,6 +17045,7 @@ function requireCjs () {
 
 	cjs.CsvError = CsvError;
 	cjs.Parser = Parser;
+	cjs.normalize_options = normalize_options;
 	cjs.parse = parse;
 	return cjs;
 }
@@ -17275,7 +17337,7 @@ function requireSync () {
 	    );
 	  }
 	  // Normalize option `columns`
-	  options.cast_first_line_to_header = null;
+	  options.cast_first_line_to_header = undefined;
 	  if (options.columns === true) {
 	    // Fields in the first line are converted as-is to columns
 	    options.cast_first_line_to_header = undefined;
@@ -17807,7 +17869,7 @@ function requireSync () {
 	  // Normalize option `to`
 	  if (options.to === undefined || options.to === null) {
 	    options.to = -1;
-	  } else {
+	  } else if (options.to !== -1) {
 	    if (typeof options.to === "string" && /\d+/.test(options.to)) {
 	      options.to = parseInt(options.to);
 	    }
@@ -17826,7 +17888,7 @@ function requireSync () {
 	  // Normalize option `to_line`
 	  if (options.to_line === undefined || options.to_line === null) {
 	    options.to_line = -1;
-	  } else {
+	  } else if (options.to_line !== -1) {
 	    if (typeof options.to_line === "string" && /\d+/.test(options.to_line)) {
 	      options.to_line = parseInt(options.to_line);
 	    }
@@ -17957,10 +18019,14 @@ function requireSync () {
 	              this.state.bufBytesStart += bomLength;
 	              buf = buf.slice(bomLength);
 	              // Renormalize original options with the new encoding
-	              this.options = normalize_options({
+	              const options = normalize_options({
 	                ...this.original_options,
 	                encoding: encoding,
 	              });
+	              // Properties are merged with the existing options instance
+	              for (const key in options) {
+	                this.options[key] = options[key];
+	              }
 	              // Options will re-evaluate the Buffer with the new encoding
 	              ({ comment, escape, quote } = this.options);
 	              break;
@@ -18703,10 +18769,14 @@ function requireSync () {
 	      if (skip_records_with_error) {
 	        this.state.recordHasError = true;
 	        if (this.options.on_skip !== undefined) {
-	          this.options.on_skip(
-	            err,
-	            raw ? this.state.rawBuffer.toString(encoding) : undefined,
-	          );
+	          try {
+	            this.options.on_skip(
+	              err,
+	              raw ? this.state.rawBuffer.toString(encoding) : undefined,
+	            );
+	          } catch (err) {
+	            return err;
+	          }
 	        }
 	        // this.emit('skip', err, raw ? this.state.rawBuffer.toString(encoding) : undefined);
 	        return undefined;
@@ -18760,10 +18830,13 @@ function requireSync () {
 	    }
 	  };
 	  const close = () => {};
-	  const err1 = parser.parse(data, false, push, close);
-	  if (err1 !== undefined) throw err1;
-	  const err2 = parser.parse(undefined, true, push, close);
-	  if (err2 !== undefined) throw err2;
+	  const error = parser.parse(data, true, push, close);
+	  if (error !== undefined) throw error;
+	  // 250606: `parser.parse` was implemented as 2 calls:
+	  // const err1 = parser.parse(data, false, push, close);
+	  // if (err1 !== undefined) throw err1;
+	  // const err2 = parser.parse(undefined, true, push, close);
+	  // if (err2 !== undefined) throw err2;
 	  return records;
 	};
 
@@ -18778,34 +18851,55 @@ var hasRequiredSimpleJsonpath;
 function requireSimpleJsonpath () {
 	if (hasRequiredSimpleJsonpath) return simpleJsonpath;
 	hasRequiredSimpleJsonpath = 1;
-	// Simple JSONPath implementation for basic path queries
+	// Simple JSONPath implementation with caching for performance
+	const pathCache = new Map();
+
+	function parsePath(path) {
+	    if (pathCache.has(path)) {
+	        return pathCache.get(path);
+	    }
+	    
+	    // Handle simple dot notation like "$.name" or "name"
+	    let normalizedPath = path;
+	    if (path.startsWith('$.')) {
+	        normalizedPath = path.substring(2);
+	    } else if (path.startsWith('$')) {
+	        normalizedPath = path.substring(1);
+	    }
+	    
+	    if (!normalizedPath) {
+	        pathCache.set(path, []);
+	        return [];
+	    }
+	    
+	    // Split path by dots, handling array indices - optimized regex
+	    const parts = normalizedPath.split(/[.\[\]]/).filter(Boolean);
+	    
+	    // Pre-compile parts for faster lookup
+	    const compiledParts = parts.map(part => {
+	        if (/^\d+$/.test(part)) {
+	            return { type: 'index', value: parseInt(part, 10) };
+	        }
+	        return { type: 'property', value: part };
+	    });
+	    
+	    pathCache.set(path, compiledParts);
+	    return compiledParts;
+	}
+
 	function value(obj, path) {
 	    if (!obj || !path) return undefined;
 	    
-	    // Handle simple dot notation like "$.name" or "name"
-	    if (path.startsWith('$.')) {
-	        path = path.substring(2);
-	    } else if (path.startsWith('$')) {
-	        path = path.substring(1);
-	    }
-	    
-	    if (!path) return obj;
-	    
-	    // Split path by dots, handling array indices
-	    const parts = path.split(/[.\[\]]/).filter(Boolean);
+	    const parts = parsePath(path);
+	    if (parts.length === 0) return obj;
 	    
 	    let current = obj;
-	    for (const part of parts) {
-	        if (current === null || current === undefined) {
-	            return undefined;
-	        }
+	    // Optimize: Use for loop and early returns for better performance
+	    for (let i = 0; i < parts.length; i++) {
+	        if (current == null) return undefined; // Covers both null and undefined
 	        
-	        // Handle array index
-	        if (/^\d+$/.test(part)) {
-	            current = current[parseInt(part)];
-	        } else {
-	            current = current[part];
-	        }
+	        const part = parts[i];
+	        current = current[part.value]; // Works for both arrays and objects
 	    }
 	    
 	    return current;
@@ -21944,6 +22038,19 @@ function requireAdapterFactory () {
 	  async adapt(rawData, root, responseMapping, transformerFactory, params) {
 	    return await adapt(this.adapter, rawData, root, responseMapping, transformerFactory, params);
 	  }
+
+	  // Delegate methods needed for streaming
+	  getValue(object, path, type) {
+	    return this.adapter.getValue(object, path, type);
+	  }
+
+	  getRoot(data, path, type) {
+	    return this.adapter.getRoot(data, path, type);
+	  }
+
+	  async parse(rawData, params) {
+	    return this.adapter.parse(rawData, params);
+	  }
 	}
 
 	AdapterFactory_1 = AdapterFactory;
@@ -21977,7 +22084,7 @@ function requireLowercaseTransformer () {
 	    if (value === null || value === undefined || value === "") {
 	      return undefined;
 	    }
-	    return value.toLowerCase();
+	    return typeof value === 'string' ? value.toLowerCase() : String(value).toLowerCase();
 	  }
 	}
 
@@ -21996,7 +22103,7 @@ function requireUppercaseTransformer () {
 	    if (value === null || value === undefined || value === "") {
 	      return undefined;
 	    }
-	    return value.toUpperCase();
+	    return typeof value === 'string' ? value.toUpperCase() : String(value).toUpperCase();
 	  }
 	}
 
@@ -22019,9 +22126,15 @@ function requireMultipleTransformer () {
 	    if (value === null || value === undefined || value === "") {
 	      return undefined;
 	    }
-	    return this.transformers.reduce((value, transformer) => {
-	      return transformer.transform(value);
-	    }, value);
+	    
+	    let currentValue = value;
+	    for (let i = 0; i < this.transformers.length; i++) {
+	      currentValue = this.transformers[i].transform(currentValue);
+	      if (currentValue === null || currentValue === undefined) {
+	        return undefined;
+	      }
+	    }
+	    return currentValue;
 	  }
 	}
 
@@ -22040,7 +22153,7 @@ function requireTrimTransformer () {
 	    if (value === null || value === undefined || value === "") {
 	      return undefined;
 	    }
-	    return value.trim();
+	    return typeof value === 'string' ? value.trim() : String(value).trim();
 	  }
 	}
 
@@ -22068,12 +22181,23 @@ function requireTransformerFactory () {
 	      uppercase: new UppercaseTransformer(),
 	      trim: new TrimTransformer()
 	    };
+	    // Cache for compiled transformer chains to avoid repeated creation
+	    this.transformerCache = new Map();
+	    // Cache for MultipleTransformer instances to avoid recreation
+	    this.multipleTransformerCache = new Map();
 	  }
 	  register(name, transformer) {
 	    this.transformers[name] = transformer;
 	  }
 
 	  get(type) {
+	    // Check cache first for performance
+	    if (this.transformerCache.has(type)) {
+	      return this.transformerCache.get(type);
+	    }
+	    
+	    let transformer;
+	    
 	    if (type.includes("|")) {
 	      const transformerTypes = type.split("|");
 	      const transformers = transformerTypes
@@ -22081,15 +22205,25 @@ function requireTransformerFactory () {
 	        .filter(transformer => transformer !== undefined);
 
 	      if (transformers.length === 0) {
-	        return this.transformers.default;
+	        transformer = this.transformers.default;
 	      } else if (transformers.length === 1) {
-	        return transformers[0];
+	        transformer = transformers[0];
+	      } else {
+	        const multipleKey = transformerTypes.join("|");
+	        if (this.multipleTransformerCache.has(multipleKey)) {
+	          transformer = this.multipleTransformerCache.get(multipleKey);
+	        } else {
+	          transformer = new MultipleTransformer(transformers);
+	          this.multipleTransformerCache.set(multipleKey, transformer);
+	        }
 	      }
-
-	      return new MultipleTransformer(transformers);
+	    } else {
+	      transformer = this.transformers[type] || this.transformers.default;
 	    }
-
-	    return this.transformers[type] || this.transformers.default;
+	    
+	    // Cache the result
+	    this.transformerCache.set(type, transformer);
+	    return transformer;
 	  }
 
 	  static load(config, transformerTypes = {}) {
@@ -22122,15 +22256,29 @@ function requireDateTransformer () {
 	class DateTransformer {
 	  constructor(mapping = {}) {
 	    this.mapping = mapping;
+	    this.inputPattern = this.mapping.pattern || "YYYY-MM-DD'T'HH:mm:ss";
+	    this.outputFormat = this.mapping.format || "YYYY-MM-DD HH:mm:ss Z";
+	    this.momentCache = new Map();
 	  }
 
 	  transform(value) {
 	    if (value === null || value === undefined || value === "") {
 	      return undefined;
 	    }
-	    return moment(value, this.mapping.pattern || "YYYY-MM-DD'T'HH:mm:ss").format(
-	      this.mapping.format || "YYYY-MM-DD HH:mm:ss Z"
-	    );
+	    
+	    const cacheKey = `${value}:${this.inputPattern}:${this.outputFormat}`;
+	    if (this.momentCache.has(cacheKey)) {
+	      return this.momentCache.get(cacheKey);
+	    }
+	    
+	    const result = moment(value, this.inputPattern).format(this.outputFormat);
+	    
+	    if (this.momentCache.size > 1000) {
+	      this.momentCache.clear();
+	    }
+	    this.momentCache.set(cacheKey, result);
+	    
+	    return result;
 	  }
 	}
 
@@ -22255,14 +22403,13 @@ function requireMapExecutor () {
 	const TransformerFactory = requireTransformerFactory();
 	const TRANSFORMER_TYPES = requireTransformerTypes();
 	const { readStdIn } = requireInput();
+	const { adaptStream } = requireAdapter();
 
 	async function mapExecutor(config) {
-	  
 	  const stream = config.stream;
 	  const format = config.format;
 
 	  const transformerFactory = TransformerFactory.load(config, TRANSFORMER_TYPES);
-
 	  const adapterFactory = new AdapterFactory();
 	  const adapter = adapterFactory.get(format, config);
 
@@ -22271,15 +22418,30 @@ function requireMapExecutor () {
 	    process.exit(1);
 	  };
 
-	  if (stream) {
+	  // Use streaming for CSV format by default to avoid memory issues
+	  const useStreaming = stream || format === 'csv';
+
+	  if (useStreaming) {
 	    const parser = await adapter.stream(config.root?.path, config);
-	    const adapterTransformer = new AdapterTransformer(adapter, config, transformerFactory);
+	    const adapterTransformer = new AdapterTransformer(adapter, config, transformerFactory, stream);
+	    
+	    if (!stream) {
+	      // Start JSON array output
+	      process.stdout.write('[');
+	    }
+	    
 	    process.stdin
 	      .pipe(parser)
 	      .on("error", onError)
 	      .pipe(adapterTransformer)
 	      .on("error", onError)
-	      .pipe(process.stdout)
+	      .on('end', () => {
+	        if (!stream) {
+	          // Close JSON array
+	          process.stdout.write(']\n');
+	        }
+	      })
+	      .pipe(process.stdout, { end: false })
 	      .on("error", onError);
 	    return;
 	  }
@@ -22294,17 +22456,60 @@ function requireMapExecutor () {
 	}
 
 	class AdapterTransformer extends Transform {
-	  constructor(adapter, mapping, transformerFactory) {
-	    super({ objectMode: true, readableObjectMode: true, writableObjectMode: true });
+	  constructor(adapter, mapping, transformerFactory, streamMode = false) {
+	    super({ objectMode: true, readableObjectMode: false, writableObjectMode: true });
 	    this.adapter = adapter;
 	    this.mapping = mapping;
 	    this.transformerFactory = transformerFactory;
+	    this.streamMode = streamMode;
+	    this.isFirst = true;
+	    this.batch = [];
+	    this.batchSize = 100; // Process in batches for better performance
+	  }
+
+	  async _processBatch() {
+	    if (this.batch.length === 0) return;
+	    
+	    const results = await Promise.all(
+	      this.batch.map(chunk => adaptStream(this.adapter, chunk, this.mapping.mapping, this.transformerFactory))
+	    );
+	    
+	    if (this.streamMode) {
+	      // Stream mode: output each item individually
+	      const jsonOutputs = results.map(output => `${JSON.stringify(output)}\n`);
+	      this.push(jsonOutputs.join(''));
+	    } else {
+	      // Array mode: output as compact JSON array items
+	      const jsonOutputs = results.map((output, index) => {
+	        if (this.isFirst && index === 0) {
+	          this.isFirst = false;
+	          return JSON.stringify(output);
+	        }
+	        return `,${JSON.stringify(output)}`;
+	      });
+	      this.push(jsonOutputs.join(''));
+	    }
+	    
+	    this.batch = [];
 	  }
 
 	  _transform(chunk, _, callback) {
-	    this.adapter
-	      .adapt(chunk, undefined, this.mapping.mapping, this.transformerFactory)
-	      .then(output => callback(null, JSON.stringify(output, null, 2)));
+	    this.batch.push(chunk);
+	    
+	    if (this.batch.length >= this.batchSize) {
+	      this._processBatch()
+	        .then(() => callback())
+	        .catch(err => callback(err));
+	    } else {
+	      callback();
+	    }
+	  }
+
+	  _flush(callback) {
+	    // Process any remaining items in the batch
+	    this._processBatch()
+	      .then(() => callback())
+	      .catch(err => callback(err));
 	  }
 	}
 
@@ -22326,20 +22531,22 @@ function requireExecutable () {
 	  const args = process.argv.slice(2);
 
 	  try {
-	    const [action, format, delimiter, columns, options, transformers, mapping] = args;
+	    const [action, format, delimiter, columns, options, transformers, mapping, stream] = args;
 
 	    if (action !== "map") {
 	      console.error(`Unknown action: ${action}. Expected "map".`.red);
 	      process.exit(1);
 	    }
 
+	    const baseOptions = options ? JSON.parse(options) : {};
 	    const config = {
+	      ...baseOptions,
 	      format: format || "",
 	      delimiter: delimiter || ",",
 	      columns: columns || "",
-	      options: options ? JSON.parse(options) : {},
 	      transformers: transformers ? JSON.parse(transformers) : [],
-	      mapping: mapping ? JSON.parse(mapping) : {}
+	      mapping: mapping ? JSON.parse(mapping) : {},
+	      stream: stream === "true"
 	    };
 
 	    await mapExecutor(config);

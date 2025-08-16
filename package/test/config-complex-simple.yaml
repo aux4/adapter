@@ -1,0 +1,138 @@
+config:
+  # JSON - Create basic nested objects
+  json-basic-objects:
+    format: json
+    path: $.users
+    mapping:
+      id: $.id
+      firstName: $.profile.firstName
+      lastName: $.profile.lastName
+      contact:
+        type: object
+        mapping:
+          email: $.profile.email
+          age: $.profile.age
+          homeCity: $.contacts.addresses[0].city
+          primaryPhone: $.contacts.phones[0].number
+      employment:
+        type: object
+        mapping:
+          company: $.employment.company
+          position: $.employment.position
+          salary: $.employment.salary
+      preferences:
+        type: object
+        mapping:
+          theme: $.preferences.theme
+          emailNotifications: $.preferences.notifications.email
+
+  # JSON - Simple flattened structure (single object)
+  json-simple-flat:
+    format: json
+    mapping:
+      user1Id: $.users[0].id
+      user1FirstName: $.users[0].profile.firstName
+      user1LastName: $.users[0].profile.lastName
+      user1Email: $.users[0].profile.email
+      user1Age: $.users[0].profile.age
+      user1HomeCity: $.users[0].contacts.addresses[0].city
+      user1Company: $.users[0].employment.company
+      user2Id: $.users[1].id
+      user2FirstName: $.users[1].profile.firstName
+      user2LastName: $.users[1].profile.lastName
+      user2Email: $.users[1].profile.email
+      user2Company: $.users[1].employment.company
+
+  # CSV - Transform flat data to complex nested structure
+  csv-to-complex:
+    format: csv
+    mapping:
+      person:
+        type: object
+        mapping:
+          id:
+            path: $.id
+            type: number
+          firstName: $.firstName
+          lastName: $.lastName
+          email: $.email
+          age:
+            path: $.age
+            type: number
+      employment:
+        type: object
+        mapping:
+          company: $.company
+          position: $.position
+          salary:
+            path: $.salary
+            type: number
+
+  # Test nested object mapping
+  json-nested-simple:
+    format: json
+    mapping:
+      metadata:
+        type: object
+        mapping:
+          version: $.metadata.version
+          totalUsers: $.metadata.totalUsers
+          lastUpdated: $.metadata.lastUpdated
+      firstUser:
+        type: object
+        mapping:
+          id: $.users[0].id
+          firstName: $.users[0].profile.firstName
+          lastName: $.users[0].profile.lastName
+          email: $.users[0].profile.email
+          company: $.users[0].employment.company
+      secondUser:
+        type: object
+        mapping:
+          id: $.users[1].id
+          firstName: $.users[1].profile.firstName
+          lastName: $.users[1].profile.lastName
+          email: $.users[1].profile.email
+          company: $.users[1].employment.company
+
+  # CSV - Alternative simpler complex structure
+  csv-simple-complex:
+    format: csv
+    mapping:
+      person:
+        type: object
+        mapping:
+          id:
+            path: $.id
+            type: number
+          firstName: $.firstName
+          lastName: $.lastName
+          email: $.email
+          age:
+            path: $.age
+            type: number
+      contact:
+        type: object
+        mapping:
+          mobilePhone: $.mobilePhone
+          workPhone: $.workPhone
+          homeAddress:
+            type: object
+            mapping:
+              street: $.homeStreet
+              city: $.homeCity
+              state: $.homeState
+          workAddress:
+            type: object
+            mapping:
+              street: $.workStreet
+              city: $.workCity
+              state: $.workState
+      employment:
+        type: object
+        mapping:
+          company: $.company
+          position: $.position
+          salary:
+            path: $.salary
+            type: number

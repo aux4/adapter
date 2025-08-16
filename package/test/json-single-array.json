@@ -1,0 +1,57 @@
+{
+  "person": {
+    "id": 12345,
+    "profile": {
+      "firstName": "John",
+      "lastName": "Doe",
+      "fullName": "John Doe"
+    },
+    "addresses": [
+      {
+        "type": "home",
+        "street": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zipCode": "10001",
+        "coordinates": {
+          "latitude": 40.7128,
+          "longitude": -74.0060
+        }
+      }
+    ],
+    "phoneNumbers": [
+      {
+        "type": "mobile",
+        "number": "+1-555-123-4567",
+        "isPrimary": true
+      }
+    ],
+    "employment": [
+      {
+        "company": "Tech Corp",
+        "position": "Senior Developer",
+        "department": "Engineering",
+        "startDate": "2020-01-15",
+        "salary": {
+          "amount": 95000,
+          "currency": "USD"
+        },
+        "benefits": [
+          {
+            "type": "health",
+            "provider": "BlueCross"
+          }
+        ]
+      }
+    ],
+    "education": [
+      {
+        "institution": "State University",
+        "degree": "Bachelor of Science",
+        "field": "Computer Science",
+        "graduationYear": 2019,
+        "gpa": 3.8
+      }
+    ]
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "timestamp": "2023-01-15T10:30:00Z"
+  },
+  "data": {
+    "employees": [
+      {
+        "id": 1,
+        "personal": {
+          "firstName": "John",
+          "lastName": "Doe",
+          "email": "john.doe@example.com"
+        },
+        "work": {
+          "department": "Engineering",
+          "position": "Senior Developer",
+          "salary": 95000,
+          "startDate": "2020-03-15"
+        },
+        "address": {
+          "street": "123 Main St",
+          "city": "New York",
+          "state": "NY",
+          "zip": "10001"
+        }
+      },
+      {
+        "id": 2,
+        "personal": {
+          "firstName": "Jane",
+          "lastName": "Smith",
+          "email": "jane.smith@example.com"
+        },
+        "work": {
+          "department": "Marketing",
+          "position": "Manager",
+          "salary": 75000,
+          "startDate": "2019-08-20"
+        },
+        "address": {
+          "street": "456 Oak Ave",
+          "city": "Boston",
+          "state": "MA",
+          "zip": "02101"
+        }
+      }
+    ]
+  }
+}

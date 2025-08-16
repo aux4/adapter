@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<library>
+    <book id="1" isbn="978-0123456789" category="fiction">
+        <title lang="en">The Great Novel</title>
+        <author nationality="US">
+            <name>John Writer</name>
+            <birthYear>1970</birthYear>
+        </author>
+        <publisher location="New York">
+            <name>Great Books Inc</name>
+            <founded>1950</founded>
+        </publisher>
+        <price currency="USD">29.99</price>
+        <pages>350</pages>
+        <published>2020-05-15</published>
+    </book>
+    <book id="2" isbn="978-0987654321" category="non-fiction">
+        <title lang="en">Learning Technology</title>
+        <author nationality="CA">
+            <name>Sarah Tech</name>
+            <birthYear>1985</birthYear>
+        </author>
+        <publisher location="Toronto">
+            <name>Tech Publishers</name>
+            <founded>1995</founded>
+        </publisher>
+        <price currency="CAD">39.99</price>
+        <pages>420</pages>
+        <published>2021-03-20</published>
+    </book>
+</library>

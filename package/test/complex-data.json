@@ -1,0 +1,122 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "profile": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "email": "john.doe@example.com",
+        "age": 31,
+        "birthDate": "1992-04-10"
+      },
+      "contacts": {
+        "addresses": [
+          {
+            "type": "home",
+            "street": "123 Main St",
+            "city": "New York",
+            "state": "NY",
+            "zipCode": "10001",
+            "country": "USA"
+          },
+          {
+            "type": "work",
+            "street": "456 Business Ave",
+            "city": "New York",
+            "state": "NY",
+            "zipCode": "10002",
+            "country": "USA"
+          }
+        ],
+        "phones": [
+          {
+            "type": "mobile",
+            "number": "+1-555-123-4567",
+            "isPrimary": true
+          },
+          {
+            "type": "work",
+            "number": "+1-555-987-6543",
+            "isPrimary": false
+          }
+        ]
+      },
+      "employment": {
+        "company": "Tech Corp",
+        "position": "Senior Developer",
+        "department": "Engineering",
+        "salary": 95000,
+        "startDate": "2020-03-15",
+        "skills": ["JavaScript", "Python", "Docker", "AWS"]
+      },
+      "preferences": {
+        "theme": "dark",
+        "notifications": {
+          "email": true,
+          "sms": false,
+          "push": true
+        },
+        "privacy": {
+          "profileVisible": true,
+          "contactVisible": false
+        }
+      }
+    },
+    {
+      "id": 2,
+      "profile": {
+        "firstName": "Jane",
+        "lastName": "Smith",
+        "email": "jane.smith@example.com",
+        "age": 28,
+        "birthDate": "1995-08-22"
+      },
+      "contacts": {
+        "addresses": [
+          {
+            "type": "home",
+            "street": "789 Oak Lane",
+            "city": "Boston",
+            "state": "MA",
+            "zipCode": "02101",
+            "country": "USA"
+          }
+        ],
+        "phones": [
+          {
+            "type": "mobile",
+            "number": "+1-555-555-1234",
+            "isPrimary": true
+          }
+        ]
+      },
+      "employment": {
+        "company": "Design Studio",
+        "position": "UX Designer",
+        "department": "Design",
+        "salary": 75000,
+        "startDate": "2021-06-01",
+        "skills": ["Figma", "Sketch", "Photoshop", "User Research"]
+      },
+      "preferences": {
+        "theme": "light",
+        "notifications": {
+          "email": true,
+          "sms": true,
+          "push": false
+        },
+        "privacy": {
+          "profileVisible": false,
+          "contactVisible": true
+        }
+      }
+    }
+  ],
+  "metadata": {
+    "version": "2.1",
+    "lastUpdated": "2023-12-01T15:30:00Z",
+    "totalUsers": 2,
+    "departments": ["Engineering", "Design", "Marketing"],
+    "supportedCountries": ["USA", "Canada", "UK"]
+  }
+}

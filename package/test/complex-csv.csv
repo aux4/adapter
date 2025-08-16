@@ -1,0 +1,3 @@
+id,firstName,lastName,email,age,homeStreet,homeCity,homeState,workStreet,workCity,workState,mobilePhone,workPhone,company,position,salary,skills,emailNotif,smsNotif
+1,John,Doe,john.doe@example.com,31,123 Main St,New York,NY,456 Business Ave,New York,NY,+1-555-123-4567,+1-555-987-6543,Tech Corp,Senior Developer,95000,JavaScript;Python;Docker;AWS,true,false
+2,Jane,Smith,jane.smith@example.com,28,789 Oak Lane,Boston,MA,"","","",+1-555-555-1234,"",Design Studio,UX Designer,75000,Figma;Sketch;Photoshop,true,true

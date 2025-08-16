@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<organization>
+  <departments>
+    <department id="1" name="Engineering">
+      <location>Building A</location>
+      <budget>500000</budget>
+    </department>
+    <department id="2" name="Design">
+      <location>Building B</location>
+      <budget>300000</budget>
+    </department>
+  </departments>
+</organization>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog>
+    <product id="P001" status="active">
+        <name>Laptop Computer</name>
+        <description>High-performance laptop with 16GB RAM</description>
+        <specifications>
+            <processor>Intel i7</processor>
+            <memory unit="GB">16</memory>
+            <storage type="SSD" unit="GB">512</storage>
+            <display size="15.6" unit="inches">1920x1080</display>
+        </specifications>
+        <pricing>
+            <basePrice currency="USD">1299.99</basePrice>
+            <discountPrice currency="USD" expires="2023-12-31">1099.99</discountPrice>
+        </pricing>
+        <availability>
+            <inStock>true</inStock>
+            <quantity>25</quantity>
+            <warehouse location="CA">15</warehouse>
+            <warehouse location="TX">10</warehouse>
+        </availability>
+    </product>
+</catalog>

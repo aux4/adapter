@@ -1,0 +1,166 @@
+config:
+  # JSON - Create basic nested objects
+  json-to-structured:
+    format: json
+    path: $.users
+    mapping:
+      id: $.id
+      firstName: $.profile.firstName
+      lastName: $.profile.lastName
+      contact:
+        type: object
+        mapping:
+          email: $.profile.email
+          age:
+            path: $.profile.age
+            type: number
+          primaryPhone: $.contacts.phones[0].number
+          homeCity: $.contacts.addresses[0].city
+          homeState: $.contacts.addresses[0].state
+      employment:
+        type: object
+        mapping:
+          company: $.employment.company
+          position: $.employment.position
+          department: $.employment.department
+          salary:
+            path: $.employment.salary
+            type: number
+      preferences:
+        type: object
+        mapping:
+          theme: $.preferences.theme
+          emailNotifications:
+            path: $.preferences.notifications.email
+            type: boolean
+
+  # JSON - Flatten complex structure
+  json-flattened:
+    format: json
+    path: $.users
+    mapping:
+      userId: $.id
+      firstName: $.profile.firstName
+      lastName: $.profile.lastName
+      email: $.profile.email
+      age:
+        path: $.profile.age
+        type: number
+      homeStreet: $.contacts.addresses[0].street
+      homeCity: $.contacts.addresses[0].city
+      homeState: $.contacts.addresses[0].state
+      primaryPhone: $.contacts.phones[0].number
+      jobTitle: $.employment.position
+      company: $.employment.company
+      salary:
+        path: $.employment.salary
+        type: number
+      topSkill: $.employment.skills[0]
+      emailNotifications:
+        path: $.preferences.notifications.email
+        type: boolean
+
+  # CSV - Transform flat data into basic objects
+  csv-to-objects:
+    format: csv
+    mapping:
+      employee:
+        type: object
+        mapping:
+          id:
+            path: $.id
+            type: number
+          firstName: $.firstName
+          lastName: $.lastName
+          email: $.email
+          age:
+            path: $.age
+            type: number
+          mobilePhone: $.mobilePhone
+          homeAddress:
+            type: object
+            mapping:
+              street: $.homeStreet
+              city: $.homeCity
+              state: $.homeState
+      job:
+        type: object
+        mapping:
+          company: $.company
+          position: $.position
+          salary:
+            path: $.salary
+            type: number
+      preferences:
+        type: object
+        mapping:
+          emailNotifications:
+            path: $.emailNotif
+            type: boolean
+          smsNotifications:
+            path: $.smsNotif
+            type: boolean
+
+  # XML - Basic XML to object mapping
+  xml-to-complex:
+    format: xml
+    path: $.organization.departments.department
+    mapping:
+      id: $._attr.id
+      name: $._attr.name
+      location: $.location
+      budget:
+        path: $.budget
+        type: number
+
+  # JSON - Basic array processing
+  json-array-transform:
+    format: json
+    mapping:
+      summary:
+        type: object
+        mapping:
+          totalUsers:
+            path: $.metadata.totalUsers
+            type: number
+          version: $.metadata.version
+          lastUpdated: $.metadata.lastUpdated
+      firstUser:
+        type: object
+        mapping:
+          id: $.users[0].id
+          firstName: $.users[0].profile.firstName
+          lastName: $.users[0].profile.lastName
+          email: $.users[0].profile.email
+          company: $.users[0].employment.company
+
+  # JSON - Basic computed structure with defaults
+  complex-computed:
+    format: json
+    path: $.users
+    mapping:
+      profile:
+        type: object
+        mapping:
+          id: $.id
+          firstName: $.profile.firstName
+          lastName: $.profile.lastName
+          email: $.profile.email
+          age:
+            path: $.profile.age
+            type: number
+      employment:
+        type: object
+        mapping:
+          company: $.employment.company
+          position: $.employment.position
+          department: $.employment.department
+          salary:
+            path: $.employment.salary
+            type: number
+      settings:
+        type: object
+        mapping:
+          theme: $.preferences.theme
+          defaultLocation:
+            default: "home"

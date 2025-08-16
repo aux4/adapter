@@ -38,4 +38,9 @@ Adapt configuration values to specific formats.
       The JSON mapping configuration to use.
 
       Default: {}
+
+    --stream [false]
+      Output stream to write the mapped value to.
+
+      Default: false
 ```

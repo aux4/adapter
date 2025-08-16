@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<company>
+    <metadata>
+        <version>1.0</version>
+        <lastUpdated>2023-01-15T10:30:00Z</lastUpdated>
+    </metadata>
+    <employees>
+        <employee id="101">
+            <personal>
+                <firstName>John</firstName>
+                <lastName>Doe</lastName>
+                <email>john.doe@example.com</email>
+            </personal>
+            <work>
+                <department>Engineering</department>
+                <position>Senior Developer</position>
+                <salary currency="USD">95000</salary>
+                <startDate>2020-03-15</startDate>
+            </work>
+            <address>
+                <street>123 Main St</street>
+                <city>New York</city>
+                <state>NY</state>
+                <zipCode>10001</zipCode>
+            </address>
+        </employee>
+        <employee id="102">
+            <personal>
+                <firstName>Jane</firstName>
+                <lastName>Smith</lastName>
+                <email>jane.smith@example.com</email>
+            </personal>
+            <work>
+                <department>Marketing</department>
+                <position>Manager</position>
+                <salary currency="USD">75000</salary>
+                <startDate>2019-08-20</startDate>
+            </work>
+            <address>
+                <street>456 Oak Ave</street>
+                <city>Boston</city>
+                <state>MA</state>
+                <zipCode>02101</zipCode>
+            </address>
+        </employee>
+    </employees>
+</company>

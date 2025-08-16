@@ -16,46 +16,6 @@
       "name": "main",
       "commands": [
         {
-          "name": "testing",
-          "execute": [
-            "log: map values(format, delimiter, columns, options, transformers, mapping)"
-          ],
-          "help": {
-            "text": "Log Testing",
-            "variables": [
-              {
-                "name": "format",
-                "text": "The format to map the value to, e.g., 'json', 'xml'."
-              },
-              {
-                "name": "delimiter",
-                "text": "The delimiter to use for separating values in the output, if applicable.",
-                "default": ","
-              },
-              {
-                "name": "columns",
-                "text": "The columns to include in the output, if applicable.",
-                "default": ""
-              },
-              {
-                "name": "options",
-                "text": "Additional options for the mapping process.",
-                "default": "{}"
-              },
-              {
-                "name": "transformers",
-                "text": "The JSON transformers to apply to the value before mapping.",
-                "default": "[]"
-              },
-              {
-                "name": "mapping",
-                "text": "The JSON mapping configuration to use.",
-                "default": "{}"
-              }
-            ]
-          }
-        },
-        {
           "name": "adapter",
           "execute": [
             "profile:adapter"
@@ -72,7 +32,7 @@
         {
           "name": "map",
           "execute": [
-            "stdin:node ${packageDir}/lib/aux4-adapter.js map values(format, delimiter, columns, options, transformers, mapping)"
+            "stdin:node ${packageDir}/lib/aux4-adapter.js map values(format, delimiter, columns, options, transformers, mapping, stream)"
           ],
           "help": {
             "text": "Maps a configuration value to a specific format.",
@@ -105,6 +65,11 @@
                 "name": "mapping",
                 "text": "The JSON mapping configuration to use.",
                 "default": "{}"
+              },
+              {
+                "name": "stream",
+                "text": "Output stream to write the mapped value to.",
+                "default": "false"
               }
             ]
           }

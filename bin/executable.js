@@ -9,20 +9,22 @@ process.title = "aux4-adapter";
   const args = process.argv.slice(2);
 
   try {
-    const [action, format, delimiter, columns, options, transformers, mapping] = args;
+    const [action, format, delimiter, columns, options, transformers, mapping, stream] = args;
 
     if (action !== "map") {
       console.error(`Unknown action: ${action}. Expected "map".`.red);
       process.exit(1);
     }
 
+    const baseOptions = options ? JSON.parse(options) : {};
     const config = {
+      ...baseOptions,
       format: format || "",
       delimiter: delimiter || ",",
       columns: columns || "",
-      options: options ? JSON.parse(options) : {},
       transformers: transformers ? JSON.parse(transformers) : [],
-      mapping: mapping ? JSON.parse(mapping) : {}
+      mapping: mapping ? JSON.parse(mapping) : {},
+      stream: stream === "true"
     };
 
     await mapExecutor(config);

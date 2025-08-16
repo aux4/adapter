@@ -5,7 +5,7 @@
 - should parse a CSV file with `simple` configuration
 
 ```execute
-cat content.csv | aux4 adapter map --configFile config-csv.yaml --config simple
+cat content.csv | aux4 adapter map --configFile config-csv.yaml --config simple | jq .
 ```
 
 ```expect
@@ -36,7 +36,7 @@ cat content.csv | aux4 adapter map --configFile config-csv.yaml --config simple
 - should parse a CSV file with `pipe` configuration
 
 ```execute
-cat content-pipe.csv | aux4 adapter map --configFile config-csv.yaml --config pipe
+cat content-pipe.csv | aux4 adapter map --configFile config-csv.yaml --config pipe | jq .
 ```
 
 ```expect
@@ -63,7 +63,7 @@ cat content-pipe.csv | aux4 adapter map --configFile config-csv.yaml --config pi
 - should parse a CSV file without column names with `no-header` configuration
 
 ```execute
-cat content-no-columns.csv | aux4 adapter map --configFile config-csv.yaml --config no-header
+cat content-no-columns.csv | aux4 adapter map --configFile config-csv.yaml --config no-header | jq .
 ```
 
 ```expect
@@ -90,7 +90,7 @@ cat content-no-columns.csv | aux4 adapter map --configFile config-csv.yaml --con
 - should parse a CSV file with a `nested` configuration
 
 ```execute
-cat content.csv | aux4 adapter map --configFile config-csv.yaml --config nested
+cat content.csv | aux4 adapter map --configFile config-csv.yaml --config nested | jq .
 ```
 
 ```expect
