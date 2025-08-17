@@ -136,3 +136,32 @@ config:
           salary:
             path: $.salary
             type: number
+
+  # CSV - Transform to complex structure with phone and address arrays
+  csv-to-arrays:
+    format: csv
+    mapping:
+      person:
+        type: object
+        mapping:
+          id:
+            path: $.id
+            type: number
+          firstName: $.firstName
+          lastName: $.lastName
+          email: $.email
+          age:
+            path: $.age
+            type: number
+      phones:
+        expr: |
+          [
+            mobilePhone ? { "number": mobilePhone, "type": "MOBILE" },
+            workPhone ? { "number": workPhone, "type": "WORK" }
+          ][$ != null]
+      addresses:
+        expr: |
+          [
+            homeStreet ? { "street": homeStreet, "city": homeCity, "state": homeState, "type": "HOME" },
+            workStreet ? { "street": workStreet, "city": workCity, "state": workState, "type": "WORK" }
+          ][$ != null]

@@ -160,3 +160,72 @@ cat complex-csv.csv | aux4 adapter map --configFile config-complex-simple.yaml -
   }
 ]
 ```
+
+## CSV to Complex Arrays Structure
+
+- should transform flat CSV data into complex structure with phone and address arrays using `csv-to-arrays` configuration
+
+```execute
+cat complex-csv.csv | aux4 adapter map --configFile config-complex-simple.yaml --config csv-to-arrays | jq .
+```
+
+```expect
+[
+  {
+    "person": {
+      "id": 1,
+      "firstName": "John",
+      "lastName": "Doe",
+      "email": "john.doe@example.com",
+      "age": 31
+    },
+    "phones": [
+      {
+        "number": "+1-555-123-4567",
+        "type": "MOBILE"
+      },
+      {
+        "number": "+1-555-987-6543",
+        "type": "WORK"
+      }
+    ],
+    "addresses": [
+      {
+        "street": "123 Main St",
+        "city": "New York",
+        "state": "NY",
+        "type": "HOME"
+      },
+      {
+        "street": "456 Business Ave",
+        "city": "New York",
+        "state": "NY",
+        "type": "WORK"
+      }
+    ]
+  },
+  {
+    "person": {
+      "id": 2,
+      "firstName": "Jane",
+      "lastName": "Smith",
+      "email": "jane.smith@example.com",
+      "age": 28
+    },
+    "phones": [
+      {
+        "number": "+1-555-555-1234",
+        "type": "MOBILE"
+      }
+    ],
+    "addresses": [
+      {
+        "street": "789 Oak Lane",
+        "city": "Boston",
+        "state": "MA",
+        "type": "HOME"
+      }
+    ]
+  }
+]
+```
