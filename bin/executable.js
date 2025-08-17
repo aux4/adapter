@@ -16,15 +16,14 @@ process.title = "aux4-adapter";
       process.exit(1);
     }
 
-    const baseOptions = options ? JSON.parse(options) : {};
     const config = {
-      ...baseOptions,
       format: format || "",
       delimiter: delimiter || ",",
       columns: columns || "",
       transformers: transformers ? JSON.parse(transformers) : [],
       mapping: mapping ? JSON.parse(mapping) : {},
-      stream: stream === "true"
+      stream: stream === "true",
+      options: options ? JSON.parse(options) : {}
     };
 
     await mapExecutor(config);
