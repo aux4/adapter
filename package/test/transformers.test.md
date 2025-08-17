@@ -5,8 +5,21 @@
 ### Basic transformation
 - should return value unchanged with `default` transformer
 
+```file:config.yaml
+config:
+  default-test:
+    format: json
+    mapping:
+      name:
+        path: $.name
+        transformer: default
+      city:
+        path: $.city
+        transformer: default
+```
+
 ```execute
-cat transformer-data.json | aux4 adapter map --configFile config-transformers.yaml --config default-test | jq .
+cat transformer-data.json | aux4 adapter map --config default-test | jq .
 ```
 
 ```expect
@@ -19,8 +32,21 @@ cat transformer-data.json | aux4 adapter map --configFile config-transformers.ya
 ### Null/undefined values
 - should handle null values with `default` transformer
 
+```file:config.yaml
+config:
+  default-test:
+    format: json
+    mapping:
+      name:
+        path: $.name
+        transformer: default
+      city:
+        path: $.city
+        transformer: default
+```
+
 ```execute
-cat transformer-null-data.json | aux4 adapter map --configFile config-transformers.yaml --config default-test | jq .
+cat transformer-null-data.json | aux4 adapter map --config default-test | jq .
 ```
 
 ```expect
@@ -32,8 +58,21 @@ cat transformer-null-data.json | aux4 adapter map --configFile config-transforme
 ### Basic string conversion
 - should convert string to lowercase with `lowercase` transformer
 
+```file:config.yaml
+config:
+  lowercase-test:
+    format: json
+    mapping:
+      name:
+        path: $.name
+        transformer: lowercase
+      city:
+        path: $.city
+        transformer: lowercase
+```
+
 ```execute
-cat transformer-uppercase-data.json | aux4 adapter map --configFile config-transformers.yaml --config lowercase-test | jq .
+cat transformer-uppercase-data.json | aux4 adapter map --config lowercase-test | jq .
 ```
 
 ```expect
@@ -46,8 +85,21 @@ cat transformer-uppercase-data.json | aux4 adapter map --configFile config-trans
 ### Mixed case conversion
 - should convert mixed case string to lowercase
 
+```file:config.yaml
+config:
+  mixed-lowercase-test:
+    format: json
+    mapping:
+      name:
+        path: $.name
+        transformer: lowercase
+      status:
+        path: $.status
+        transformer: lowercase
+```
+
 ```execute
-cat transformer-mixed-data.json | aux4 adapter map --configFile config-transformers.yaml --config mixed-lowercase-test | jq .
+cat transformer-mixed-data.json | aux4 adapter map --config mixed-lowercase-test | jq .
 ```
 
 ```expect
@@ -60,8 +112,21 @@ cat transformer-mixed-data.json | aux4 adapter map --configFile config-transform
 ### Number conversion
 - should convert number to lowercase string
 
+```file:config.yaml
+config:
+  number-lowercase-test:
+    format: json
+    mapping:
+      code:
+        path: $.code
+        transformer: lowercase
+      id:
+        path: $.id
+        transformer: lowercase
+```
+
 ```execute
-cat transformer-number-data.json | aux4 adapter map --configFile config-transformers.yaml --config number-lowercase-test | jq .
+cat transformer-number-data.json | aux4 adapter map --config number-lowercase-test | jq .
 ```
 
 ```expect
@@ -74,8 +139,21 @@ cat transformer-number-data.json | aux4 adapter map --configFile config-transfor
 ### Empty/null values
 - should handle empty and null values with `lowercase` transformer
 
+```file:config.yaml
+config:
+  lowercase-test:
+    format: json
+    mapping:
+      name:
+        path: $.name
+        transformer: lowercase
+      city:
+        path: $.city
+        transformer: lowercase
+```
+
 ```execute
-cat transformer-null-data.json | aux4 adapter map --configFile config-transformers.yaml --config lowercase-test | jq .
+cat transformer-null-data.json | aux4 adapter map --config lowercase-test | jq .
 ```
 
 ```expect
@@ -87,8 +165,21 @@ cat transformer-null-data.json | aux4 adapter map --configFile config-transforme
 ### Basic string conversion
 - should convert string to uppercase with `uppercase` transformer
 
+```file:config.yaml
+config:
+  uppercase-test:
+    format: json
+    mapping:
+      name:
+        path: $.name
+        transformer: uppercase
+      city:
+        path: $.city
+        transformer: uppercase
+```
+
 ```execute
-cat transformer-lowercase-data.json | aux4 adapter map --configFile config-transformers.yaml --config uppercase-test | jq .
+cat transformer-lowercase-data.json | aux4 adapter map --config uppercase-test | jq .
 ```
 
 ```expect
@@ -101,8 +192,21 @@ cat transformer-lowercase-data.json | aux4 adapter map --configFile config-trans
 ### Mixed case conversion
 - should convert mixed case string to uppercase
 
+```file:config.yaml
+config:
+  mixed-uppercase-test:
+    format: json
+    mapping:
+      name:
+        path: $.name
+        transformer: uppercase
+      status:
+        path: $.status
+        transformer: uppercase
+```
+
 ```execute
-cat transformer-mixed-data.json | aux4 adapter map --configFile config-transformers.yaml --config mixed-uppercase-test | jq .
+cat transformer-mixed-data.json | aux4 adapter map --config mixed-uppercase-test | jq .
 ```
 
 ```expect
@@ -115,8 +219,21 @@ cat transformer-mixed-data.json | aux4 adapter map --configFile config-transform
 ### Number conversion
 - should convert number to uppercase string
 
+```file:config.yaml
+config:
+  number-uppercase-test:
+    format: json
+    mapping:
+      code:
+        path: $.code
+        transformer: uppercase
+      id:
+        path: $.id
+        transformer: uppercase
+```
+
 ```execute
-cat transformer-number-data.json | aux4 adapter map --configFile config-transformers.yaml --config number-uppercase-test | jq .
+cat transformer-number-data.json | aux4 adapter map --config number-uppercase-test | jq .
 ```
 
 ```expect
@@ -129,8 +246,21 @@ cat transformer-number-data.json | aux4 adapter map --configFile config-transfor
 ### Empty/null values
 - should handle empty and null values with `uppercase` transformer
 
+```file:config.yaml
+config:
+  uppercase-test:
+    format: json
+    mapping:
+      name:
+        path: $.name
+        transformer: uppercase
+      city:
+        path: $.city
+        transformer: uppercase
+```
+
 ```execute
-cat transformer-null-data.json | aux4 adapter map --configFile config-transformers.yaml --config uppercase-test | jq .
+cat transformer-null-data.json | aux4 adapter map --config uppercase-test | jq .
 ```
 
 ```expect
@@ -142,8 +272,21 @@ cat transformer-null-data.json | aux4 adapter map --configFile config-transforme
 ### Leading and trailing spaces
 - should remove leading and trailing whitespace with `trim` transformer
 
+```file:config.yaml
+config:
+  trim-test:
+    format: json
+    mapping:
+      name:
+        path: $.name
+        transformer: trim
+      city:
+        path: $.city
+        transformer: trim
+```
+
 ```execute
-cat transformer-trim-data.json | aux4 adapter map --configFile config-transformers.yaml --config trim-test | jq .
+cat transformer-trim-data.json | aux4 adapter map --config trim-test | jq .
 ```
 
 ```expect
@@ -156,8 +299,21 @@ cat transformer-trim-data.json | aux4 adapter map --configFile config-transforme
 ### Only leading spaces
 - should remove only leading whitespace
 
+```file:config.yaml
+config:
+  trim-test:
+    format: json
+    mapping:
+      name:
+        path: $.name
+        transformer: trim
+      city:
+        path: $.city
+        transformer: trim
+```
+
 ```execute
-cat transformer-trim-leading-data.json | aux4 adapter map --configFile config-transformers.yaml --config trim-test | jq .
+cat transformer-trim-leading-data.json | aux4 adapter map --config trim-test | jq .
 ```
 
 ```expect
@@ -170,8 +326,21 @@ cat transformer-trim-leading-data.json | aux4 adapter map --configFile config-tr
 ### Only trailing spaces
 - should remove only trailing whitespace
 
+```file:config.yaml
+config:
+  trim-test:
+    format: json
+    mapping:
+      name:
+        path: $.name
+        transformer: trim
+      city:
+        path: $.city
+        transformer: trim
+```
+
 ```execute
-cat transformer-trim-trailing-data.json | aux4 adapter map --configFile config-transformers.yaml --config trim-test | jq .
+cat transformer-trim-trailing-data.json | aux4 adapter map --config trim-test | jq .
 ```
 
 ```expect
@@ -184,8 +353,21 @@ cat transformer-trim-trailing-data.json | aux4 adapter map --configFile config-t
 ### No spaces
 - should leave strings without whitespace unchanged
 
+```file:config.yaml
+config:
+  trim-test:
+    format: json
+    mapping:
+      name:
+        path: $.name
+        transformer: trim
+      city:
+        path: $.city
+        transformer: trim
+```
+
 ```execute
-cat transformer-no-spaces-data.json | aux4 adapter map --configFile config-transformers.yaml --config trim-test | jq .
+cat transformer-no-spaces-data.json | aux4 adapter map --config trim-test | jq .
 ```
 
 ```expect
@@ -198,8 +380,21 @@ cat transformer-no-spaces-data.json | aux4 adapter map --configFile config-trans
 ### Number conversion
 - should convert number to trimmed string
 
+```file:config.yaml
+config:
+  number-trim-test:
+    format: json
+    mapping:
+      code:
+        path: $.code
+        transformer: trim
+      id:
+        path: $.id
+        transformer: trim
+```
+
 ```execute
-cat transformer-number-data.json | aux4 adapter map --configFile config-transformers.yaml --config number-trim-test | jq .
+cat transformer-number-data.json | aux4 adapter map --config number-trim-test | jq .
 ```
 
 ```expect
@@ -212,8 +407,21 @@ cat transformer-number-data.json | aux4 adapter map --configFile config-transfor
 ### Empty/null values
 - should handle empty and null values with `trim` transformer
 
+```file:config.yaml
+config:
+  trim-test:
+    format: json
+    mapping:
+      name:
+        path: $.name
+        transformer: trim
+      city:
+        path: $.city
+        transformer: trim
+```
+
 ```execute
-cat transformer-null-data.json | aux4 adapter map --configFile config-transformers.yaml --config trim-test | jq .
+cat transformer-null-data.json | aux4 adapter map --config trim-test | jq .
 ```
 
 ```expect
@@ -225,8 +433,21 @@ cat transformer-null-data.json | aux4 adapter map --configFile config-transforme
 ### Trim and lowercase
 - should apply trim then lowercase transformations
 
+```file:config.yaml
+config:
+  multiple-trim-lowercase:
+    format: json
+    mapping:
+      name:
+        path: $.name
+        transformer: trim|lowercase
+      city:
+        path: $.city
+        transformer: trim|lowercase
+```
+
 ```execute
-cat transformer-multiple-trim-upper-data.json | aux4 adapter map --configFile config-transformers.yaml --config multiple-trim-lowercase | jq .
+cat transformer-multiple-trim-upper-data.json | aux4 adapter map --config multiple-trim-lowercase | jq .
 ```
 
 ```expect
@@ -239,8 +460,21 @@ cat transformer-multiple-trim-upper-data.json | aux4 adapter map --configFile co
 ### Trim and uppercase
 - should apply trim then uppercase transformations
 
+```file:config.yaml
+config:
+  multiple-trim-uppercase:
+    format: json
+    mapping:
+      name:
+        path: $.name
+        transformer: trim|uppercase
+      city:
+        path: $.city
+        transformer: trim|uppercase
+```
+
 ```execute
-cat transformer-trim-data.json | aux4 adapter map --configFile config-transformers.yaml --config multiple-trim-uppercase | jq .
+cat transformer-trim-data.json | aux4 adapter map --config multiple-trim-uppercase | jq .
 ```
 
 ```expect
@@ -253,8 +487,21 @@ cat transformer-trim-data.json | aux4 adapter map --configFile config-transforme
 ### Three transformations
 - should apply multiple transformations in sequence
 
+```file:config.yaml
+config:
+  multiple-complex:
+    format: json
+    mapping:
+      name:
+        path: $.name
+        transformer: trim|uppercase|lowercase
+      status:
+        path: $.status
+        transformer: trim|lowercase|uppercase
+```
+
 ```execute
-cat transformer-multiple-complex-data.json | aux4 adapter map --configFile config-transformers.yaml --config multiple-complex | jq .
+cat transformer-multiple-complex-data.json | aux4 adapter map --config multiple-complex | jq .
 ```
 
 ```expect
@@ -267,8 +514,21 @@ cat transformer-multiple-complex-data.json | aux4 adapter map --configFile confi
 ### Empty/null values with multiple transformers
 - should handle empty and null values with multiple transformers
 
+```file:config.yaml
+config:
+  multiple-trim-lowercase:
+    format: json
+    mapping:
+      name:
+        path: $.name
+        transformer: trim|lowercase
+      city:
+        path: $.city
+        transformer: trim|lowercase
+```
+
 ```execute
-cat transformer-null-data.json | aux4 adapter map --configFile config-transformers.yaml --config multiple-trim-lowercase | jq .
+cat transformer-null-data.json | aux4 adapter map --config multiple-trim-lowercase | jq .
 ```
 
 ```expect

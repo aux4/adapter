@@ -4,8 +4,20 @@
 
 - should parse a simple JSON object with `simple` configuration
 
+```file:config.yaml
+config:
+  simple:
+    format: json
+    mapping:
+      name: $.name
+      age: $.age
+      birthdate: $.birthdate
+      gender: $.gender
+      city: $.city
+```
+
 ```execute
-cat json-simple.json | aux4 adapter map --configFile config-json.yaml --config simple | jq .
+cat json-simple.json | aux4 adapter map --config simple | jq .
 ```
 
 ```expect
@@ -22,8 +34,20 @@ cat json-simple.json | aux4 adapter map --configFile config-json.yaml --config s
 
 - should process JSON array with `array` configuration
 
+```file:config.yaml
+config:
+  array:
+    format: json
+    mapping:
+      name: $.name
+      age: $.age
+      birthdate: $.birthdate
+      gender: $.gender
+      city: $.city
+```
+
 ```execute
-cat json-array.json | aux4 adapter map --configFile config-json.yaml --config array | jq .
+cat json-array.json | aux4 adapter map --config array | jq .
 ```
 
 ```expect
@@ -56,8 +80,21 @@ cat json-array.json | aux4 adapter map --configFile config-json.yaml --config ar
 
 - should extract data from nested JSON structure with `nested-simple` configuration
 
+```file:config.yaml
+config:
+  nested-simple:
+    format: json
+    mapping:
+      firstName: $.users[0].profile.name
+      firstAge: $.users[0].profile.age
+      firstCity: $.users[0].details.location.city
+      secondName: $.users[1].profile.name
+      secondAge: $.users[1].profile.age
+      secondCity: $.users[1].details.location.city
+```
+
 ```execute
-cat json-nested.json | aux4 adapter map --configFile config-json.yaml --config nested-simple | jq .
+cat json-nested.json | aux4 adapter map --config nested-simple | jq .
 ```
 
 ```expect
@@ -75,8 +112,23 @@ cat json-nested.json | aux4 adapter map --configFile config-json.yaml --config n
 
 - should process complex nested JSON with `complex-simple` configuration
 
+```file:config.yaml
+config:
+  complex-simple:
+    format: json
+    mapping:
+      version: $.metadata.version
+      timestamp: $.metadata.timestamp
+      employee1Name: $.data.employees[0].personal.firstName
+      employee1Email: $.data.employees[0].personal.email
+      employee1Dept: $.data.employees[0].work.department
+      employee2Name: $.data.employees[1].personal.firstName
+      employee2Email: $.data.employees[1].personal.email
+      employee2Dept: $.data.employees[1].work.department
+```
+
 ```execute
-cat json-complex.json | aux4 adapter map --configFile config-json.yaml --config complex-simple | jq .
+cat json-complex.json | aux4 adapter map --config complex-simple | jq .
 ```
 
 ```expect
@@ -96,8 +148,27 @@ cat json-complex.json | aux4 adapter map --configFile config-json.yaml --config 
 
 - should apply transformers to JSON data with `with-transformers` configuration
 
+```file:config.yaml
+config:
+  with-transformers:
+    format: json
+    mapping:
+      name:
+        path: $.name
+        transformer: uppercase
+      age:
+        path: $.age
+        type: number
+      city:
+        path: $.city
+        transformer: lowercase
+      gender:
+        path: $.gender
+        transformer: trim
+```
+
 ```execute
-cat json-simple.json | aux4 adapter map --configFile config-json.yaml --config with-transformers | jq .
+cat json-simple.json | aux4 adapter map --config with-transformers | jq .
 ```
 
 ```expect
@@ -113,8 +184,26 @@ cat json-simple.json | aux4 adapter map --configFile config-json.yaml --config w
 
 - should create nested objects from JSON data with `nested-objects` configuration
 
+```file:config.yaml
+config:
+  nested-objects:
+    format: json
+    mapping:
+      employee:
+        type: object
+        mapping:
+          id: $.data.employees[0].id
+          name: $.data.employees[0].personal.firstName
+          department: $.data.employees[0].work.department
+      metadata:
+        type: object
+        mapping:
+          version: $.metadata.version
+          timestamp: $.metadata.timestamp
+```
+
 ```execute
-cat json-complex.json | aux4 adapter map --configFile config-json.yaml --config nested-objects | jq .
+cat json-complex.json | aux4 adapter map --config nested-objects | jq .
 ```
 
 ```expect
@@ -135,8 +224,18 @@ cat json-complex.json | aux4 adapter map --configFile config-json.yaml --config 
 
 - should access basic nested properties with `basic-nested` configuration
 
+```file:config.yaml
+config:
+  basic-nested:
+    format: json
+    mapping:
+      name: $.users[0].profile.name
+      age: $.users[0].profile.age
+      city: $.users[0].details.location.city
+```
+
 ```execute
-cat json-nested.json | aux4 adapter map --configFile config-json.yaml --config basic-nested | jq .
+cat json-nested.json | aux4 adapter map --config basic-nested | jq .
 ```
 
 ```expect
@@ -151,8 +250,36 @@ cat json-nested.json | aux4 adapter map --configFile config-json.yaml --config b
 
 - should extract fields from arrays with single elements using array indexing
 
+```file:config.yaml
+config:
+  single-array-extraction:
+    format: json
+    mapping:
+      personId: $.person.id
+      firstName: $.person.profile.firstName
+      lastName: $.person.profile.lastName
+      homeCity: $.person.addresses[0].city
+      homeState: $.person.addresses[0].state
+      homeStreet: $.person.addresses[0].street
+      homeZip: $.person.addresses[0].zipCode
+      latitude: $.person.addresses[0].coordinates.latitude
+      longitude: $.person.addresses[0].coordinates.longitude
+      phoneNumber: $.person.phoneNumbers[0].number
+      phoneType: $.person.phoneNumbers[0].type
+      isPrimaryPhone: $.person.phoneNumbers[0].isPrimary
+      company: $.person.employment[0].company
+      position: $.person.employment[0].position
+      department: $.person.employment[0].department
+      salary: $.person.employment[0].salary.amount
+      currency: $.person.employment[0].salary.currency
+      university: $.person.education[0].institution
+      degree: $.person.education[0].degree
+      field: $.person.education[0].field
+      graduationYear: $.person.education[0].graduationYear
+```
+
 ```execute
-cat json-single-array.json | aux4 adapter map --configFile config-json.yaml --config single-array-extraction | jq .
+cat json-single-array.json | aux4 adapter map --config single-array-extraction | jq .
 ```
 
 ```expect
@@ -185,8 +312,43 @@ cat json-single-array.json | aux4 adapter map --configFile config-json.yaml --co
 
 - should create nested objects from array elements with `nested-array-objects` configuration
 
+```file:config.yaml
+config:
+  nested-array-objects:
+    format: json
+    mapping:
+      contact:
+        type: object
+        mapping:
+          name: $.person.profile.fullName
+          phone: $.person.phoneNumbers[0].number
+          address:
+            type: object
+            mapping:
+              street: $.person.addresses[0].street
+              city: $.person.addresses[0].city
+              state: $.person.addresses[0].state
+              zip: $.person.addresses[0].zipCode
+      work:
+        type: object
+        mapping:
+          company: $.person.employment[0].company
+          position: $.person.employment[0].position
+          salary:
+            type: object
+            mapping:
+              amount: $.person.employment[0].salary.amount
+              currency: $.person.employment[0].salary.currency
+      education:
+        type: object
+        mapping:
+          school: $.person.education[0].institution
+          degree: $.person.education[0].degree
+          gpa: $.person.education[0].gpa
+```
+
 ```execute
-cat json-single-array.json | aux4 adapter map --configFile config-json.yaml --config nested-array-objects | jq .
+cat json-single-array.json | aux4 adapter map --config nested-array-objects | jq .
 ```
 
 ```expect

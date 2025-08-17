@@ -4,8 +4,20 @@
 
 - should parse a CSV file with `simple` configuration
 
+```file:config.yaml
+config:
+  simple:
+    format: csv
+    mapping:
+      name: $.name
+      age: $.age
+      birthdate: $.birthdate
+      gender: $.gender
+      city: $.city
+```
+
 ```execute
-cat content.csv | aux4 adapter map --configFile config-csv.yaml --config simple | jq .
+cat content.csv | aux4 adapter map --config simple | jq .
 ```
 
 ```expect
@@ -35,8 +47,21 @@ cat content.csv | aux4 adapter map --configFile config-csv.yaml --config simple 
 
 - should parse a CSV file with `pipe` configuration
 
+```file:config.yaml
+config:
+  pipe:
+    format: csv
+    delimiter: "|"
+    mapping:
+      name: $.name
+      age: $.age
+      birthdate: $.birthdate
+      gender: $.gender
+      city: $.city
+```
+
 ```execute
-cat content-pipe.csv | aux4 adapter map --configFile config-csv.yaml --config pipe | jq .
+cat content-pipe.csv | aux4 adapter map --config pipe | jq .
 ```
 
 ```expect
@@ -62,8 +87,21 @@ cat content-pipe.csv | aux4 adapter map --configFile config-csv.yaml --config pi
 
 - should parse a CSV file without column names with `no-header` configuration
 
+```file:config.yaml
+config:
+  no-header:
+    format: csv
+    columns: name,age,birthdate,gender,city
+    mapping:
+      name: $.name
+      age: $.age
+      birthdate: $.birthdate
+      gender: $.gender
+      city: $.city
+```
+
 ```execute
-cat content-no-columns.csv | aux4 adapter map --configFile config-csv.yaml --config no-header | jq .
+cat content-no-columns.csv | aux4 adapter map --config no-header | jq .
 ```
 
 ```expect
@@ -89,8 +127,23 @@ cat content-no-columns.csv | aux4 adapter map --configFile config-csv.yaml --con
 
 - should parse a CSV file with a `nested` configuration
 
+```file:config.yaml
+config:
+  nested:
+    format: csv
+    mapping:
+      name: $.name
+      age: $.age
+      birthdate: $.birthdate
+      gender: $.gender
+      place:
+        type: object
+        mapping:
+          city: $.city
+```
+
 ```execute
-cat content.csv | aux4 adapter map --configFile config-csv.yaml --config nested | jq .
+cat content.csv | aux4 adapter map --config nested | jq .
 ```
 
 ```expect

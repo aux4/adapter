@@ -8,13 +8,18 @@ aux4 adapter --help
 
 ```expect
 adapter
-Adapt configuration values to specific formats.
+Adapt data to specific formats.
 
   map
-  Maps a configuration value to a specific format.
+  Maps the data from STDIN to a specific format.
 
     --format
-      The format to map the value to, e.g., 'json', 'xml'.
+      The format to map the value to, e.g., 'csv', 'json', 'xml'.
+
+      Options:
+      * csv
+      * json
+      * xml
 
     --delimiter [,]
       The delimiter to use for separating values in the output, if applicable.
