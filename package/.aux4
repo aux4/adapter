@@ -2,7 +2,7 @@
   "scope": "aux4",
   "name": "adapter",
   "version": "1.0.0",
-  "description": "Aux4 adapter for mapping configuration values to specific formats.",
+  "description": "aux4 adapter for mapping data to specific formats.",
   "tags": [
     "aux4",
     "adapter",
@@ -10,6 +10,9 @@
     "json",
     "xml",
     "csv"
+  ],
+  "dependencies": [
+    "aux4/config"
   ],
   "profiles": [
     {
@@ -21,7 +24,7 @@
             "profile:adapter"
           ],
           "help": {
-            "text": "Adapt configuration values to specific formats."
+            "text": "Adapt data to specific formats."
           }
         }
       ]
@@ -35,11 +38,16 @@
             "stdin:node ${packageDir}/lib/aux4-adapter.js map values(format, delimiter, columns, options, transformers, mapping, stream)"
           ],
           "help": {
-            "text": "Maps a configuration value to a specific format.",
+            "text": "Maps the data from STDIN to a specific format.",
             "variables": [
               {
                 "name": "format",
-                "text": "The format to map the value to, e.g., 'json', 'xml'."
+                "text": "The format to map the value to, e.g., 'csv', 'json', 'xml'.",
+                "options": [
+                  "csv",
+                  "json",
+                  "xml"
+                ]
               },
               {
                 "name": "delimiter",
