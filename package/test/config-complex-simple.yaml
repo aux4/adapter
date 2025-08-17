@@ -155,13 +155,13 @@ config:
             type: number
       phones:
         expr: |
-          [
+          $append([], $filter([
             mobilePhone ? { "number": mobilePhone, "type": "MOBILE" },
             workPhone ? { "number": workPhone, "type": "WORK" }
-          ][$ != null]
+          ], function($v) { $v != null }))
       addresses:
         expr: |
-          [
+          $append([], $filter([
             homeStreet ? { "street": homeStreet, "city": homeCity, "state": homeState, "type": "HOME" },
             workStreet ? { "street": workStreet, "city": workCity, "state": workState, "type": "WORK" }
-          ][$ != null]
+          ], function($v) { $v != null }))
