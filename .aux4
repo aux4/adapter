@@ -6,7 +6,7 @@
         {
           "name": "build",
           "execute": [
-            "npm run builld"
+            "npm run build"
           ],
           "help": {
             "text": "Build aux4/adapter"
