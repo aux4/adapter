@@ -455,6 +455,52 @@ config:
 cat complex-csv.csv | aux4 adapter map --configFile config-complex-simple.yaml --config csv-simple-complex
 ```
 
+## Command Line Options
+
+### Streaming Output (--stream)
+
+By default, the adapter outputs data as a JSON array. Use the `--stream` parameter to output each item as individual JSON objects (one per line).
+
+**Standard output (JSON array):**
+```bash
+cat content.csv | aux4 adapter map --config simple
+# Output: [{"name":"John",...},{"name":"Jane",...}]
+```
+
+**Streaming output (individual JSON objects):**
+```bash
+cat content.csv | aux4 adapter map --config simple --stream
+# Output:
+# {"name":"John",...}
+# {"name":"Jane",...}
+```
+
+### CSV Parser Options (--options)
+
+Pass additional options to the CSV parser to control parsing behavior. Options must be provided as a JSON string.
+
+**Skip lines from the beginning:**
+```bash
+cat content.csv | aux4 adapter map --config simple --options '{"from":2}'
+# Skips first data row and processes from the second row onwards
+```
+
+You can also configure parser options directly in the configuration file:
+
+```yaml
+config:
+  simple:
+    format: csv
+    options:
+      from: 2  # Skip first data row
+    mapping:
+      name: $.name
+      age: $.age
+      birthdate: $.birthdate
+      gender: $.gender
+      city: $.city
+```
+
 ## License
 
 This package does not include a license file. Please refer to your organization's licensing policies.
