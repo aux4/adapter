@@ -461,38 +461,59 @@ cat complex-csv.csv | aux4 adapter map --configFile config-complex-simple.yaml -
 
 By default, the adapter outputs data as a JSON array. Use the `--stream` parameter to output each item as individual JSON objects (one per line).
 
+**Sample CSV input (content.csv):**
+
+```csv
+name,age,birthdate,gender,city
+John,,1992-04-10,M,New York
+Jane,29,1994-02-10,F,
+Dane,42,1936-03-11,,Boston
+```
+
 **Standard output (JSON array):**
+
 ```bash
 cat content.csv | aux4 adapter map --config simple
-# Output: [{"name":"John",...},{"name":"Jane",...}]
+```
+
+**Output:**
+
+```json
+[
+  { "name": "John", "birthdate": "1992-04-10", "gender": "M", "city": "New York" },
+  { "name": "Jane", "age": "29", "birthdate": "1994-02-10", "gender": "F" },
+  { "name": "Dane", "age": "42", "birthdate": "1936-03-11", "city": "Boston" }
+]
 ```
 
 **Streaming output (individual JSON objects):**
+
 ```bash
 cat content.csv | aux4 adapter map --config simple --stream
-# Output:
-# {"name":"John",...}
-# {"name":"Jane",...}
+```
+
+**Output:**
+
+```json
+{"name":"John","birthdate":"1992-04-10","gender":"M","city":"New York"}
+{"name":"Jane","age":"29","birthdate":"1994-02-10","gender":"F"}
+{"name":"Dane","age":"42","birthdate":"1936-03-11","city":"Boston"}
 ```
 
 ### CSV Parser Options (--options)
 
-Pass additional options to the CSV parser to control parsing behavior. Options must be provided as a JSON string.
+Pass additional options to the CSV parser to control parsing behavior. Options can be provided as command-line JSON or directly in the configuration file.
 
-**Skip lines from the beginning:**
-```bash
-cat content.csv | aux4 adapter map --config simple --options '{"from":2}'
-# Skips first data row and processes from the second row onwards
-```
+**Skip lines from the beginning using configuration:**
 
-You can also configure parser options directly in the configuration file:
+Set up your configuration file to skip the first data row and process from the second row onwards:
 
 ```yaml
 config:
   simple:
     format: csv
     options:
-      from: 2  # Skip first data row
+      from: 2 # Skip first data row (John)
     mapping:
       name: $.name
       age: $.age
@@ -500,6 +521,26 @@ config:
       gender: $.gender
       city: $.city
 ```
+
+**Command:**
+
+```bash
+cat content.csv | aux4 adapter map --config simple
+```
+
+**Output:**
+
+```json
+[
+  { "name": "Jane", "age": "29", "birthdate": "1994-02-10", "gender": "F" },
+  { "name": "Dane", "age": "42", "birthdate": "1936-03-11", "city": "Boston" }
+]
+```
+
+## See Also
+
+- [aux4/config](/r/public/packages/aux4/config) for more information on configuration files.
+- [aux4/validator](/r/public/packages/aux4/validator) for validating data against schemas.
 
 ## License
 
