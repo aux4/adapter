@@ -544,4 +544,4 @@ cat content.csv | aux4 adapter map --config simple
 
 ## License
 
-This package does not include a license file. Please refer to your organization's licensing policies.
+Apache-2.0
