@@ -379,6 +379,199 @@ config:
 cat transformer-trim-data.json | aux4 adapter map --configFile config-transformers.yaml --config multiple-trim-uppercase
 ```
 
+## Field Mapping Forms
+
+Each entry in a `mapping` block can be written either as a **shorthand string** (just a JSONPath) or as an **object** that unlocks transformers, defaults, type conversion, templates, nested mappings and expressions.
+
+### Shorthand (JSONPath string)
+
+```yaml
+mapping:
+  name: $.name
+```
+
+### Object form
+
+The object form supports the following keys:
+
+| Key           | Description                                                                                  |
+| ------------- | -------------------------------------------------------------------------------------------- |
+| `path`        | JSONPath to read the value from (e.g. `$.profile.name`).                                      |
+| `type`        | Coerce/structure the value: `number`, `boolean`, `array`, `object` (see below).              |
+| `default`     | Value used when the resolved value is missing, `null`, or empty.                             |
+| `transformer` | Name of a transformer (or pipe-chained transformers) to apply to the value.                  |
+| `text`        | A template string with `$.path` placeholders interpolated from the source object.            |
+| `expr`        | A built-in expression or JSONata expression evaluated against the source object (see below). |
+| `mapping`     | A nested mapping, used together with `type: object` or `type: array`.                        |
+
+```yaml
+config:
+  object-form:
+    format: json
+    mapping:
+      id:
+        path: $.id
+        type: number
+      status:
+        path: $.status
+        default: active
+```
+
+For input `{ "id": "42" }` this produces `{ "id": 42, "status": "active" }`.
+
+### Text templates (`text:`)
+
+Use `text:` to build a value from one or more source fields. JSONPath placeholders written as `$.path` are replaced with the matching value from the source object; missing values become empty strings and the result is trimmed.
+
+```yaml
+config:
+  text-template:
+    format: json
+    mapping:
+      fullName:
+        text: "$.firstName $.lastName"
+```
+
+For input `{ "firstName": "John", "lastName": "Doe" }` this produces `{ "fullName": "John Doe" }`.
+
+### Nested objects (`type: object`)
+
+Combine `type: object` with `mapping:` to build a nested structure from the same source object.
+
+```yaml
+config:
+  nested:
+    format: json
+    mapping:
+      place:
+        type: object
+        mapping:
+          city: $.address.city
+          state: $.address.state
+```
+
+## Expression Mappings
+
+Use `expr:` to compute a value. The adapter tries a set of built-in expressions first and, if none match, evaluates the string as a [JSONata](https://jsonata.org) expression against the source object.
+
+### Built-in expressions
+
+| Expression | Returns                                                                                                                        |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `uuid()`   | A **version 7 UUID** — time-ordered, so UUIDs generated later sort after earlier ones (great for sortable identifiers).         |
+| `now()`    | The current local timestamp as an ISO-8601 string with the machine's UTC offset, e.g. `2026-06-23T19:42:24-05:00`.             |
+| `utc()`    | The current timestamp in UTC as an ISO-8601 string in `Z` form, e.g. `2026-06-24T00:42:24Z`.                                    |
+| `time()`   | The current Unix timestamp in seconds since the epoch (a number), e.g. `1782261744`.                                            |
+
+```yaml
+config:
+  ids-and-dates:
+    format: json
+    mapping:
+      id:
+        expr: uuid()
+      createdAtLocal:
+        expr: now()
+      createdAtUtc:
+        expr: utc()
+      createdEpoch:
+        expr: time()
+      name: $.name
+```
+
+```bash
+echo '{"name":"John"}' | aux4 adapter map --config ids-and-dates
+```
+
+```json
+{
+  "id": "019ef71a-33c0-74c9-bd6b-488c4da098fb",
+  "createdAtLocal": "2026-06-23T19:42:24-05:00",
+  "createdAtUtc": "2026-06-24T00:42:24Z",
+  "createdEpoch": 1782261744,
+  "name": "John"
+}
+```
+
+### JSONata expressions
+
+Any expression that is not a built-in is evaluated as JSONata, which lets you compute fields, concatenate strings, filter arrays, and more. Field names in the expression refer to keys of the source object.
+
+```yaml
+config:
+  computed:
+    format: json
+    mapping:
+      fullName:
+        expr: "firstName & ' ' & lastName"
+```
+
+```bash
+echo '{"firstName":"John","lastName":"Doe"}' | aux4 adapter map --config computed
+```
+
+```json
+{
+  "fullName": "John Doe"
+}
+```
+
+## Custom Transformers
+
+In addition to the built-in transformers (`default`, `lowercase`, `uppercase`, `trim`), you can register named transformers in a `transformers:` block and reference them by name in your mapping. Custom transformers are built from these registrable types:
+
+| Type      | Configuration                                                                                                | Behavior                                                              |
+| --------- | ------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------- |
+| `date`    | `pattern` (input format, default `YYYY-MM-DD'T'HH:mm:ss`), `format` (output format, default `YYYY-MM-DD HH:mm:ss Z`) | Reformats a date string from `pattern` to `format` (via moment).     |
+| `replace` | `replace` (value→value map), `defaultValue` (optional)                                                       | Replaces the value using the map; falls back to `defaultValue`.      |
+| `remove`  | `list` (array of substrings)                                                                                  | Removes every occurrence of each listed substring from the value.    |
+
+The built-in `default` transformer returns the value unchanged.
+
+```yaml
+config:
+  custom-transformers:
+    format: json
+    transformers:
+      BIRTHDATE:
+        type: date
+        pattern: YYYY-MM-DD
+        format: MM/DD/YYYY
+      GENDER:
+        type: replace
+        replace:
+          M: MALE
+          F: FEMALE
+        defaultValue: UNKNOWN
+      PHONE:
+        type: remove
+        list:
+          - "+"
+          - "-"
+    mapping:
+      birthdate:
+        path: $.birthdate
+        transformer: BIRTHDATE
+      gender:
+        path: $.gender
+        transformer: GENDER
+      phone:
+        path: $.phone
+        transformer: PHONE
+```
+
+```bash
+echo '{"birthdate":"2020-03-15","gender":"M","phone":"+1-555-123-4567"}' | aux4 adapter map --config custom-transformers
+```
+
+```json
+{
+  "birthdate": "03/15/2020",
+  "gender": "MALE",
+  "phone": "15551234567"
+}
+```
+
 ## Complex Mappings
 
 ### JSON to nested objects
